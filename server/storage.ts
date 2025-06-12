@@ -196,7 +196,10 @@ export class MemStorage implements IStorage {
     const newTransaction: Transaction = { 
       ...transaction, 
       id, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+      isRecurring: transaction.isRecurring || false,
+      dueDate: transaction.dueDate || null,
+      expenseType: transaction.expenseType || null
     };
     this.transactions.set(id, newTransaction);
     return newTransaction;

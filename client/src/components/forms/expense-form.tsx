@@ -18,6 +18,7 @@ const expenseSchema = z.object({
   dueDate: z.string().optional(),
   categoryId: z.string().min(1, "Categoria é obrigatória"),
   status: z.enum(["pending", "paid", "overdue"]),
+  expenseType: z.enum(["fixed", "variable"]),
   isRecurring: z.boolean().optional(),
 });
 
@@ -58,6 +59,7 @@ export default function ExpenseForm({ initialData, onSuccess, categories }: Expe
       dueDate: initialData?.dueDate || "",
       categoryId: initialData?.categoryId?.toString() || "",
       status: (initialData?.status as any) || "pending",
+      expenseType: (initialData as any)?.expenseType || "variable",
       isRecurring: initialData?.isRecurring || false,
     },
   });
@@ -70,6 +72,7 @@ export default function ExpenseForm({ initialData, onSuccess, categories }: Expe
         categoryId: parseInt(data.categoryId),
         type: "expense",
         dueDate: data.dueDate || null,
+        expenseType: data.expenseType,
       };
       return apiRequest("POST", "/api/transactions", payload);
     },
@@ -96,6 +99,7 @@ export default function ExpenseForm({ initialData, onSuccess, categories }: Expe
         amount: parseFloat(data.amount).toString(),
         categoryId: parseInt(data.categoryId),
         dueDate: data.dueDate || null,
+        expenseType: data.expenseType,
       };
       return apiRequest("PUT", `/api/transactions/${initialData!.id}`, payload);
     },
@@ -180,6 +184,24 @@ export default function ExpenseForm({ initialData, onSuccess, categories }: Expe
         {form.formState.errors.categoryId && (
           <p className="text-sm text-red-600 mt-1">
             {form.formState.errors.categoryId.message}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="expenseType">Tipo de Despesa</Label>
+        <Select value={form.watch("expenseType")} onValueChange={(value) => form.setValue("expenseType", value as "fixed" | "variable")}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione o tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="fixed">Despesa Fixa</SelectItem>
+            <SelectItem value="variable">Despesa Variável</SelectItem>
+          </SelectContent>
+        </Select>
+        {form.formState.errors.expenseType && (
+          <p className="text-sm text-red-600 mt-1">
+            {form.formState.errors.expenseType.message}
           </p>
         )}
       </div>

@@ -29,6 +29,7 @@ export const transactions = pgTable("transactions", {
   categoryId: integer("category_id").references(() => categories.id).notNull(),
   status: text("status").notNull(), // 'pending', 'paid', 'received', 'overdue'
   isRecurring: boolean("is_recurring").default(false).notNull(),
+  expenseType: text("expense_type"), // 'fixed' or 'variable' (only for expenses)
   dueDate: date("due_date"),
   userId: integer("user_id").references(() => users.id).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
