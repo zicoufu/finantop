@@ -306,7 +306,7 @@ export default function Expenses() {
               </div>
             ) : (
               <div className="space-y-4">
-                {expenses
+                {filteredExpenses
                   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .map((expense) => (
                     <div key={expense.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
