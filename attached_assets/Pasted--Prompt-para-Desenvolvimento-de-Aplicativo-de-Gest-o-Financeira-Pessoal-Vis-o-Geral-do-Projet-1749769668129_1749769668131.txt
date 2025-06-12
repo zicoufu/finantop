@@ -1,0 +1,124 @@
+# Prompt para Desenvolvimento de Aplicativo de Gestão Financeira Pessoal
+
+## Visão Geral do Projeto
+Desenvolver um aplicativo web responsivo de gestão financeira pessoal com interface moderna e intuitiva, focado em controle de contas a pagar e receber, planejamento financeiro e alertas inteligentes.
+
+## Funcionalidades Principais
+
+### 1. Dashboard Principal
+- **Visão geral financeira**: Saldo atual, receitas do mês, despesas do mês
+- **Gráficos interativos**: 
+  - Gráfico de pizza para categorias de gastos
+  - Gráfico de linha para evolução mensal do saldo
+  - Gráfico de barras comparando receitas vs despesas
+- **Resumo rápido**: Próximas contas a vencer (próximos 7 dias)
+- **Indicadores visuais**: Cards coloridos para status financeiro (positivo/negativo)
+- **Filtros por período**: Visualização mensal, trimestral, anual
+
+### 2. Gestão de Despesas
+- **Cadastro de despesas**:
+  - Descrição, valor, data de vencimento, categoria
+  - Status (paga/pendente/vencida)
+  - Tipo (fixa/variável)
+  - Anexo de comprovantes (opcional)
+- **Categorias personalizáveis**: Alimentação, transporte, moradia, lazer, saúde, etc.
+- **Despesas recorrentes**: Configuração automática para contas mensais
+- **Histórico detalhado**: Lista filtravelе pesquisável de todas as despesas
+
+### 3. Gestão de Receitas
+- **Cadastro de receitas**:
+  - Descrição, valor, data de recebimento, fonte
+  - Status (recebida/pendente)
+  - Tipo (salário/freelance/investimento/outros)
+- **Receitas recorrentes**: Salários e rendas fixas automáticas
+- **Projeção de receitas**: Estimativa baseada no histórico
+
+### 4. Sistema de Alarmes e Notificações
+- **Alertas de vencimento**:
+  - Notificação 7 dias antes do vencimento
+  - Notificação no dia do vencimento
+  - Alerta de conta vencida
+- **Configurações personalizáveis**: Usuário define quando receber cada tipo de alerta
+- **Múltiplos canais**: Notificações no app, email, push notifications
+- **Lista de lembretes**: Seção dedicada para visualizar todos os alertas ativos
+
+### 5. Previsão de Investimentos
+- **Simulador de investimentos**:
+  - Cálculo de rendimento com diferentes taxas (CDI, Selic, taxa fixa)
+  - Simulação de aportes mensais
+  - Projeção a curto, médio e longo prazo (1, 3, 5, 10 anos)
+- **Comparativo de modalidades**: CDB, LCI/LCA, Tesouro Direto, fundos
+- **Meta de investimento**: Definir objetivos financeiros com prazo
+- **Gráfico de evolução**: Visualização do crescimento do patrimônio
+
+### 6. Planejamento de Compras a Longo Prazo
+- **Lista de objetivos**:
+  - Nome do objetivo (casa, carro, viagem, etc.)
+  - Valor total necessário
+  - Prazo desejado
+  - Valor já economizado
+- **Calculadora de metas**:
+  - Quanto economizar por mês para atingir o objetivo
+  - Previsão de quando conseguirá comprar
+  - Ajuste automático baseado na capacidade de poupança
+- **Progresso visual**: Barra de progresso para cada objetivo
+- **Sugestões inteligentes**: Recomendações de como acelerar as metas
+
+## Especificações Técnicas
+
+### Interface do Usuário
+- **Design**: Material Design ou similar, cores profissionais (azul/verde para positivo, vermelho para negativo)
+- **Responsividade**: Funcionar perfeitamente em desktop, tablet e mobile
+- **Tema escuro/claro**: Opção de alternância entre temas
+- **Navegação intuitiva**: Menu lateral retrátil com ícones claros
+
+### Funcionalidades Técnicas
+- **Autenticação**: Login seguro com email/senha
+- **Backup de dados**: Sincronização em nuvem
+- **Exportação**: Relatórios em PDF e Excel
+- **Importação**: Upload de extratos bancários (OFX/CSV)
+- **Segurança**: Criptografia de dados sensíveis
+
+### Tecnologias Sugeridas
+- **Frontend**: React.js com Material-UI ou Tailwind CSS
+- **Backend**: Node.js com Express.js ou Python Django
+- **Banco de dados**: PostgreSQL ou MongoDB
+- **Notificações**: Firebase Cloud Messaging
+- **Gráficos**: Chart.js ou D3.js
+- **Autenticação**: JWT ou OAuth 2.0
+
+## Fluxo de Usuário Típico
+
+1. **Login**: Usuário acessa o aplicativo
+2. **Dashboard**: Visualiza resumo financeiro atual
+3. **Cadastro**: Registra despesas e receitas do dia/mês
+4. **Planejamento**: Define metas de investimento e compras
+5. **Monitoramento**: Recebe alertas e acompanha progresso
+6. **Análise**: Consulta relatórios e toma decisões financeiras
+
+## Diferenciais do Aplicativo
+
+- **Inteligência financeira**: Análise automática de padrões de gastos
+- **Educação financeira**: Dicas e conteúdo educativo integrado
+- **Integração bancária**: Conexão com bancos para importação automática (futuro)
+- **Comunidade**: Comparação anônima com outros usuários (opcional)
+- **Gamificação**: Sistema de conquistas para incentivar bons hábitos
+
+## Métricas de Sucesso
+
+- **Engajamento**: Usuários ativos diariamente
+- **Utilidade**: Redução de contas em atraso dos usuários
+- **Satisfação**: Rating alto nas lojas de aplicativos
+- **Retenção**: Usuários que continuam usando após 3 meses
+
+## Próximos Passos para Desenvolvimento
+
+1. **Prototipagem**: Criar wireframes e mockups das telas principais
+2. **MVP**: Desenvolver versão mínima com dashboard e cadastro básico
+3. **Testes**: Validar com usuários reais e coletar feedback
+4. **Iteração**: Adicionar funcionalidades avançadas gradualmente
+5. **Launch**: Lançar versão completa com marketing direcionado
+
+---
+
+**Objetivo Final**: Criar um aplicativo que realmente ajude as pessoas a organizarem suas finanças pessoais, tomarem melhores decisões de investimento e alcançarem seus objetivos financeiros de longo prazo, tudo isso com uma interface moderna e experiência de usuário excepcional.
