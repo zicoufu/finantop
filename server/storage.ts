@@ -107,7 +107,101 @@ export class MemStorage implements IStorage {
       this.categories.set(cat.id, cat);
     });
 
-    this.currentId = 13;
+    // Add sample transactions with expense types
+    const sampleTransactions: Transaction[] = [
+      // Fixed expenses
+      {
+        id: 13,
+        description: "Aluguel",
+        amount: "1200.00",
+        date: "2025-06-01",
+        type: "expense",
+        categoryId: 4, // Moradia
+        status: "paid",
+        isRecurring: true,
+        expenseType: "fixed",
+        dueDate: null,
+        userId: 1,
+        createdAt: new Date()
+      },
+      {
+        id: 14,
+        description: "Conta de Internet",
+        amount: "89.90",
+        date: "2025-06-05",
+        type: "expense",
+        categoryId: 8, // Outros
+        status: "paid",
+        isRecurring: true,
+        expenseType: "fixed",
+        dueDate: null,
+        userId: 1,
+        createdAt: new Date()
+      },
+      {
+        id: 15,
+        description: "Seguro do Carro",
+        amount: "350.00",
+        date: "2025-06-10",
+        type: "expense",
+        categoryId: 3, // Transporte
+        status: "pending",
+        isRecurring: true,
+        expenseType: "fixed",
+        dueDate: "2025-06-15",
+        userId: 1,
+        createdAt: new Date()
+      },
+      // Variable expenses
+      {
+        id: 16,
+        description: "Supermercado",
+        amount: "250.75",
+        date: "2025-06-08",
+        type: "expense",
+        categoryId: 2, // Alimentação
+        status: "paid",
+        isRecurring: false,
+        expenseType: "variable",
+        dueDate: null,
+        userId: 1,
+        createdAt: new Date()
+      },
+      {
+        id: 17,
+        description: "Cinema",
+        amount: "35.00",
+        date: "2025-06-11",
+        type: "expense",
+        categoryId: 5, // Lazer
+        status: "paid",
+        isRecurring: false,
+        expenseType: "variable",
+        dueDate: null,
+        userId: 1,
+        createdAt: new Date()
+      },
+      {
+        id: 18,
+        description: "Combustível",
+        amount: "120.00",
+        date: "2025-06-12",
+        type: "expense",
+        categoryId: 3, // Transporte
+        status: "paid",
+        isRecurring: false,
+        expenseType: "variable",
+        dueDate: null,
+        userId: 1,
+        createdAt: new Date()
+      }
+    ];
+
+    sampleTransactions.forEach(transaction => {
+      this.transactions.set(transaction.id, transaction);
+    });
+
+    this.currentId = 19;
   }
 
   // Users

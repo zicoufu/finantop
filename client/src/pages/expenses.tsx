@@ -9,7 +9,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/currency";
 import { formatDate } from "@/lib/date";
-import { Plus, Edit, Trash2, CreditCard } from "lucide-react";
+import { Plus, Edit, Trash2, CreditCard, Filter } from "lucide-react";
 import ExpenseForm from "@/components/forms/expense-form";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,6 +22,7 @@ interface Transaction {
   status: string;
   categoryId: number;
   isRecurring: boolean;
+  expenseType?: string;
 }
 
 interface Category {
@@ -33,6 +34,7 @@ interface Category {
 export default function Expenses() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Transaction | null>(null);
+  const [expenseTypeFilter, setExpenseTypeFilter] = useState<"all" | "fixed" | "variable">("all");
   const { toast } = useToast();
 
   const { data: expenses, isLoading: expensesLoading } = useQuery<Transaction[]>({
@@ -195,13 +197,27 @@ export default function Expenses() {
     }
   };
 
+  // Filter expenses based on type filter
+  const filteredExpenses = expenses?.filter(expense => {
+    if (expenseTypeFilter === "all") return true;
+    return expense.expenseType === expenseTypeFilter;
+  }) || [];
+
   const totalExpenses = expenses
-    .filter(e => e.status === 'paid')
-    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    ?.filter(e => e.status === 'paid')
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0) || 0;
 
   const pendingExpenses = expenses
-    .filter(e => e.status === 'pending')
-    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+    ?.filter(e => e.status === 'pending')
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0) || 0;
+
+  const fixedExpenses = expenses
+    ?.filter(e => e.expenseType === 'fixed' && e.status === 'paid')
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0) || 0;
+
+  const variableExpenses = expenses
+    ?.filter(e => e.expenseType === 'variable' && e.status === 'paid')
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0) || 0;
 
   return (
     <div className="flex flex-col h-full">
@@ -216,6 +232,12 @@ export default function Expenses() {
               </span>
               <span className="text-sm text-gray-600">
                 Pendente: <span className="font-semibold text-orange-600">{formatCurrency(pendingExpenses)}</span>
+              </span>
+              <span className="text-sm text-gray-600">
+                Fixas: <span className="font-semibold text-blue-600">{formatCurrency(fixedExpenses)}</span>
+              </span>
+              <span className="text-sm text-gray-600">
+                Variáveis: <span className="font-semibold text-green-600">{formatCurrency(variableExpenses)}</span>
               </span>
             </div>
           </div>
@@ -248,13 +270,27 @@ export default function Expenses() {
       <div className="p-6 flex-1 overflow-y-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <CreditCard className="h-5 w-5 mr-2" />
-              Lista de Despesas
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center">
+                <CreditCard className="h-5 w-5 mr-2" />
+                Lista de Despesas
+              </CardTitle>
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <select
+                  value={expenseTypeFilter}
+                  onChange={(e) => setExpenseTypeFilter(e.target.value as "all" | "fixed" | "variable")}
+                  className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Todas as Despesas</option>
+                  <option value="fixed">Despesas Fixas</option>
+                  <option value="variable">Despesas Variáveis</option>
+                </select>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            {expenses.length === 0 ? (
+            {filteredExpenses.length === 0 ? (
               <div className="text-center py-12">
                 <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -286,6 +322,18 @@ export default function Expenses() {
                             <span>{getCategoryName(expense.categoryId)}</span>
                             {expense.dueDate && (
                               <span>Vence: {formatDate(expense.dueDate)}</span>
+                            )}
+                            {expense.expenseType && (
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${
+                                  expense.expenseType === 'fixed' 
+                                    ? 'bg-blue-50 text-blue-700 border-blue-200' 
+                                    : 'bg-green-50 text-green-700 border-green-200'
+                                }`}
+                              >
+                                {expense.expenseType === 'fixed' ? 'Despesa Fixa' : 'Despesa Variável'}
+                              </Badge>
                             )}
                             {expense.isRecurring && (
                               <Badge variant="outline" className="text-xs">
