@@ -461,20 +461,17 @@ export class DatabaseStorage implements IStorage {
 
   async getTransactionsByDateRange(userId: number, startDate: string, endDate: string): Promise<Transaction[]> {
     return await db.select().from(transactions)
-      .where(eq(transactions.userId, userId))
-      .where(eq(transactions.date, startDate)); // Simplified for now
+      .where(and(eq(transactions.userId, userId), eq(transactions.date, startDate)));
   }
 
   async getTransactionsByType(userId: number, type: string): Promise<Transaction[]> {
     return await db.select().from(transactions)
-      .where(eq(transactions.userId, userId))
-      .where(eq(transactions.type, type));
+      .where(and(eq(transactions.userId, userId), eq(transactions.type, type)));
   }
 
   async getUpcomingTransactions(userId: number, days: number): Promise<Transaction[]> {
     return await db.select().from(transactions)
-      .where(eq(transactions.userId, userId))
-      .where(eq(transactions.status, 'pending'));
+      .where(and(eq(transactions.userId, userId), eq(transactions.status, 'pending')));
   }
 
   async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
