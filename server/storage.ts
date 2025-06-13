@@ -7,6 +7,8 @@ import {
   type Investment, type InsertInvestment,
   type Alert, type InsertAlert
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -404,4 +406,181 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async getCategories(userId: number): Promise<Category[]> {
+    return await db.select().from(categories).where(eq(categories.userId, userId));
+  }
+
+  async getCategoriesByType(userId: number, type: string): Promise<Category[]> {
+    return await db.select().from(categories).where(and(eq(categories.userId, userId), eq(categories.type, type)));
+  }
+
+  async createCategory(category: InsertCategory): Promise<Category> {
+    const [newCategory] = await db
+      .insert(categories)
+      .values(category)
+      .returning();
+    return newCategory;
+  }
+
+  async updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category | undefined> {
+    const [updated] = await db
+      .update(categories)
+      .set(category)
+      .where(eq(categories.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    const result = await db.delete(categories).where(eq(categories.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getTransactions(userId: number): Promise<Transaction[]> {
+    return await db.select().from(transactions).where(eq(transactions.userId, userId));
+  }
+
+  async getTransactionsByDateRange(userId: number, startDate: string, endDate: string): Promise<Transaction[]> {
+    return await db.select().from(transactions)
+      .where(eq(transactions.userId, userId))
+      .where(eq(transactions.date, startDate)); // Simplified for now
+  }
+
+  async getTransactionsByType(userId: number, type: string): Promise<Transaction[]> {
+    return await db.select().from(transactions)
+      .where(eq(transactions.userId, userId))
+      .where(eq(transactions.type, type));
+  }
+
+  async getUpcomingTransactions(userId: number, days: number): Promise<Transaction[]> {
+    return await db.select().from(transactions)
+      .where(eq(transactions.userId, userId))
+      .where(eq(transactions.status, 'pending'));
+  }
+
+  async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
+    const [newTransaction] = await db
+      .insert(transactions)
+      .values(transaction)
+      .returning();
+    return newTransaction;
+  }
+
+  async updateTransaction(id: number, transaction: Partial<InsertTransaction>): Promise<Transaction | undefined> {
+    const [updated] = await db
+      .update(transactions)
+      .set(transaction)
+      .where(eq(transactions.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteTransaction(id: number): Promise<boolean> {
+    const result = await db.delete(transactions).where(eq(transactions.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getGoals(userId: number): Promise<Goal[]> {
+    return await db.select().from(goals).where(eq(goals.userId, userId));
+  }
+
+  async createGoal(goal: InsertGoal): Promise<Goal> {
+    const [newGoal] = await db
+      .insert(goals)
+      .values(goal)
+      .returning();
+    return newGoal;
+  }
+
+  async updateGoal(id: number, goal: Partial<InsertGoal>): Promise<Goal | undefined> {
+    const [updated] = await db
+      .update(goals)
+      .set(goal)
+      .where(eq(goals.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteGoal(id: number): Promise<boolean> {
+    const result = await db.delete(goals).where(eq(goals.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getInvestments(userId: number): Promise<Investment[]> {
+    return await db.select().from(investments).where(eq(investments.userId, userId));
+  }
+
+  async createInvestment(investment: InsertInvestment): Promise<Investment> {
+    const [newInvestment] = await db
+      .insert(investments)
+      .values(investment)
+      .returning();
+    return newInvestment;
+  }
+
+  async updateInvestment(id: number, investment: Partial<InsertInvestment>): Promise<Investment | undefined> {
+    const [updated] = await db
+      .update(investments)
+      .set(investment)
+      .where(eq(investments.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteInvestment(id: number): Promise<boolean> {
+    const result = await db.delete(investments).where(eq(investments.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getAlerts(userId: number): Promise<Alert[]> {
+    return await db.select().from(alerts).where(eq(alerts.userId, userId));
+  }
+
+  async getUnreadAlerts(userId: number): Promise<Alert[]> {
+    return await db.select().from(alerts)
+      .where(eq(alerts.userId, userId))
+      .where(eq(alerts.isRead, false));
+  }
+
+  async createAlert(alert: InsertAlert): Promise<Alert> {
+    const [newAlert] = await db
+      .insert(alerts)
+      .values(alert)
+      .returning();
+    return newAlert;
+  }
+
+  async markAlertAsRead(id: number): Promise<boolean> {
+    const result = await db
+      .update(alerts)
+      .set({ isRead: true })
+      .where(eq(alerts.id, id));
+    return result.rowCount > 0;
+  }
+
+  async deleteAlert(id: number): Promise<boolean> {
+    const result = await db.delete(alerts).where(eq(alerts.id, id));
+    return result.rowCount > 0;
+  }
+}
+
+export const storage = new DatabaseStorage();
