@@ -24,6 +24,7 @@
   ],
   "exclude": [
     "node_modules",
+    "server/legacy/**/*",
     "**/*.backup.*",
     "**/storage_backup_*.ts",
     "**/storage_final.ts",
