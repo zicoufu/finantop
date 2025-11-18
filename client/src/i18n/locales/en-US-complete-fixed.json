@@ -1,0 +1,351 @@
+{
+  "translation": {
+    "app": {
+      "title": "FinanceApp"
+    },
+    "preferences": {
+      "title": "User Preferences",
+      "personalSettings": "Personal Settings",
+      "language": "Language",
+      "selectLanguage": "Select language",
+      "theme": "Theme",
+      "selectTheme": "Select theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "currency": "Currency",
+      "selectCurrency": "Select currency",
+      "dateFormat": "Date Format",
+      "selectDateFormat": "Select date format",
+      "savePreferences": "Save Preferences",
+      "success": "Preferences updated",
+      "preferencesUpdated": "Your preferences have been updated successfully.",
+      "updateError": "An error occurred while updating your preferences."
+    },
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "loading": "Loading...",
+      "search": "Search",
+      "filter": "Filter",
+      "yes": "Yes",
+      "no": "No",
+      "confirm": "Confirm",
+      "success": "Success",
+      "error": "Error",
+      "user": "User",
+      "saving": "Saving...",
+      "update": "Update",
+      "create": "Create",
+      "toggleSidebar": "Toggle Sidebar"
+    },
+    "dates": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "yesterday": "Yesterday",
+      "inDays": "In {{count}} days",
+      "daysAgo": "{{count}} days ago"
+    },
+    "auth": {
+      "login": "Login",
+      "register": "Register",
+      "logout": "Logout",
+      "email": "Email",
+      "password": "Password",
+      "username": "Username",
+      "name": "Full name",
+      "createAccount": "Create account",
+      "alreadyHaveAccount": "Already have an account?",
+      "dontHaveAccount": "Don't have an account?",
+      "forgotPassword": "Forgot password?",
+      "resetPassword": "Reset password",
+      "passwordReset": "Password Reset",
+      "passwordResetSent": "A password reset email has been sent",
+      "passwordResetError": "Error sending password reset email",
+      "invalidCredentials": "Invalid credentials",
+      "accountCreated": "Account created successfully",
+      "accountCreationError": "Error creating account"
+    },
+    "navigation": {
+      "dashboard": "Dashboard",
+      "transactions": "Transactions",
+      "expenses": "Expenses",
+      "income": "Income",
+      "reports": "Reports",
+      "categories": "Categories",
+      "goals": "Goals",
+      "settings": "Settings",
+      "profile": "Profile",
+      "alerts": "Alerts",
+      "logout": "Logout"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "summary": "Summary",
+      "period": "Period",
+      "income": "Income",
+      "expenses": "Expenses",
+      "balance": "Balance",
+      "goalsProgress": "Goals Progress",
+      "goals": "Goals",
+      "createGoal": "Create Goal",
+      "viewAllGoals": "View all goals",
+      "noGoalsDefined": "No goals defined",
+      "errorLoadingGoals": "Error loading goals",
+      "charts": {
+        "expensesByCategory": "Expenses by Category",
+        "incomeVsExpenses": "Income vs Expenses (6 months)"
+      },
+      "noExpensesInPeriod": "No expenses in selected period",
+      "noTransactionsInPeriod": "No transactions found in selected period",
+      "detailedTransactions": "Detailed Transactions",
+      "table": {
+        "date": "Date",
+        "description": "Description",
+        "category": "Category",
+        "type": "Type",
+        "amount": "Amount",
+        "status": "Status"
+      }
+    },
+    "transactions": {
+      "title": "Transactions",
+      "newTransaction": "New Transaction",
+      "addTransaction": "Add Transaction",
+      "newExpense": "New Expense",
+      "fillExpenseDetails": "Fill in the details to add a new expense.",
+      "income": "Income",
+      "expense": "Expense",
+      "transfer": "Transfer",
+      "filters": {
+        "all": "All",
+        "income": "Income",
+        "expense": "Expenses"
+      },
+      "description": "Description",
+      "amount": "Amount",
+      "date": "Date",
+      "category": "Category",
+      "type": "Type",
+      "status": {
+        "label": "Status",
+        "pending": "Pending",
+        "paid": "Paid",
+        "received": "Received",
+        "overdue": "Overdue"
+      },
+      "fixed": "Fixed",
+      "variable": "Variable",
+      "recurring": "Recurring",
+      "dueDate": "Due date",
+      "dateNotDefined": "Date not defined",
+      "noTransactions": "No transactions found"
+    },
+    "categories": {
+      "title": "Categories",
+      "newCategory": "New Category",
+      "name": "Name",
+      "type": "Type",
+      "color": "Color",
+      "icon": "Icon",
+      "noCategories": "No categories found",
+      "others": "Others",
+      "housing": "Housing",
+      "food": "Food",
+      "transportation": "Transportation",
+      "entertainment": "Entertainment",
+      "health": "Health",
+      "education": "Education",
+      "utilities": "Utilities"
+    },
+    "goals": {
+      "title": "Goals",
+      "financialGoals": "Financial Goals",
+      "newGoal": "New Goal",
+      "createGoal": "Create Goal",
+      "editGoal": "Edit Goal",
+      "noGoals": "No goals found",
+      "startAddingGoals": "Start by adding your first financial goal.",
+      "totalGoals": "Total goals",
+      "totalSaved": "Total saved",
+      "progress": "Progress",
+      "saved": "Saved",
+      "target": "Target",
+      "remaining": "Remaining",
+      "targetDate": "Target date",
+      "addValue": "Add funds",
+      "achieved": "Goal achieved!",
+      "deleteConfirm": "Are you sure you want to delete this goal?",
+      "enterAmount": "Enter amount to add:",
+      "deleteSuccess": {
+        "title": "Goal deleted",
+        "description": "The goal has been successfully deleted."
+      },
+      "deleteError": "Error deleting goal",
+      "addValueSuccess": {
+        "title": "Value added",
+        "description": "The value has been successfully added to the goal."
+      },
+      "addValueError": "Error adding value to goal",
+      "notFound": "Goal not found",
+      "estimateMonths": "Estimate: {{months}} months saving {{amount}}/month",
+      "estimateYearsMonths": "Estimate: {{years}} years and {{months}} months saving {{amount}}/month",
+      "messages": {
+        "createSuccess": "Goal created successfully",
+        "createError": "Error creating goal",
+        "updateSuccess": "Goal updated successfully",
+        "updateError": "Error updating goal"
+      },
+      "validation": {
+        "nameRequired": "Goal name is required",
+        "targetAmountRequired": "Target amount is required",
+        "contributionPositive": "Monthly contribution must be a positive value",
+        "interestRateMin": "Annual interest rate must be a positive value",
+        "interestRateMax": "Annual interest rate cannot be greater than 100%"
+      },
+      "form": {
+        "name": "Goal name",
+        "namePlaceholder": "E.g., Buy a house",
+        "targetAmount": "Target amount",
+        "currentAmount": "Current amount",
+        "targetDate": "Target date",
+        "monthlyContribution": "Monthly contribution",
+        "annualInterestRate": "Annual interest rate (%)",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe your financial goal...",
+        "create": "Create goal"
+      }
+    },
+    "income": {
+      "title": "Income",
+      "newIncome": "New Income",
+      "addIncome": "Add Income",
+      "fillIncomeDetails": "Fill in the details to add a new income.",
+      "description": "Description",
+      "amount": "Amount",
+      "date": "Date",
+      "category": "Category",
+      "type": "Type",
+      "fixed": "Fixed",
+      "variable": "Variable",
+      "recurring": "Recurring",
+      "noIncome": "No income found",
+      "validation": {
+        "descriptionRequired": "Description is required",
+        "amountRequired": "Amount is required",
+        "amountPositive": "Amount must be positive",
+        "dateRequired": "Date is required",
+        "categoryRequired": "Category is required"
+      },
+      "createdSuccess": "Income created successfully",
+      "createError": "Error creating income",
+      "updatedSuccess": "Income updated successfully",
+      "updateError": "Error updating income"
+    },
+    "expenses": {
+      "title": "Expenses",
+      "newExpense": "New Expense",
+      "addExpense": "Add Expense",
+      "fillExpenseDetails": "Fill in the details to add a new expense.",
+      "description": "Description",
+      "amount": "Amount",
+      "date": "Date",
+      "dueDate": "Due date",
+      "category": "Category",
+      "selectCategory": "Select a category",
+      "type": "Expense Type",
+      "selectType": "Select type",
+      "status": "Status",
+      "statusPending": "Pending",
+      "statusPaid": "Paid",
+      "statusOverdue": "Overdue",
+      "validation": {
+        "descriptionRequired": "Description is required",
+        "amountRequired": "Amount is required",
+        "amountPositive": "Amount must be positive",
+        "dateRequired": "Date is required",
+        "dueDateRequired": "Due date is required",
+        "categoryRequired": "Category is required",
+        "typeRequired": "Type is required"
+      },
+      "noExpenses": "No expenses found",
+      "fixed": "Fixed",
+      "variable": "Variable",
+      "recurring": "Recurring",
+      "createdSuccess": "Expense created successfully",
+      "createError": "Error creating expense",
+      "updatedSuccess": "Expense updated successfully",
+      "updateError": "Error updating expense"
+    },
+    "alerts": {
+      "title": "Alerts",
+      "unreadCount": "You have {count} unread alert(s)",
+      "unread": "Unread",
+      "all": "All",
+      "dueDate": "Due Date",
+      "badge": {
+        "new": "New"
+      },
+      "expiresToday": "The expense '{expense}' is due today",
+      "expiredDays": "The expense '{expense}' is overdue by {days} day(s)",
+      "types": {
+        "dueDate": "Due Date",
+        "overdue": "Overdue",
+        "goalMilestone": "Goal Milestone",
+        "investmentMaturity": "Investment Maturity",
+        "general": "General"
+      },
+      "markAsRead": {
+        "success": {
+          "title": "Alert marked as read",
+          "description": "The alert has been successfully marked as read"
+        },
+        "error": "Error marking alert as read"
+      },
+      "delete": {
+        "success": {
+          "title": "Alert deleted",
+          "description": "The alert has been successfully deleted"
+        },
+        "error": "Error deleting alert"
+      },
+      "deleteConfirm": "Are you sure you want to delete this alert?",
+      "actions": {
+        "markAsRead": "Mark as read",
+        "delete": "Delete alert"
+      },
+      "tabs": {
+        "unread": "Unread",
+        "all": "All"
+      },
+      "empty": {
+        "unread": {
+          "title": "No unread alerts",
+          "description": "You have no unread alerts at the moment."
+        },
+        "all": {
+          "title": "No alerts",
+          "description": "You have no alerts at the moment."
+        }
+      }
+    },
+    "reports": {
+      "title": "Reports",
+      "thisMonth": "This month",
+      "export": "Export",
+      "overview": "Overview",
+      "detailed": "Detailed",
+      "income": "Income",
+      "expenses": "Expenses",
+      "balance": "Balance",
+      "goalsProgress": "Goals Progress",
+      "expensesByCategory": "Expenses by Category",
+      "incomeVsExpenses": "Income vs Expenses",
+      "months": "months",
+      "period": "Period",
+      "noData": "Not enough data to generate reports"
+    }
+  }
+}

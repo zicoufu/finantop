@@ -1,0 +1,407 @@
+{
+  "translation": {
+    "auth": {
+      "welcomeBack": "Bem-vindo de volta! Por favor, insira suas credenciais.",
+      "login": "Entrar",
+      "logout": "Sair",
+      "register": "Registrar",
+      "forgotPassword": "Esqueceu a senha?",
+      "resetPassword": "Redefinir senha",
+      "noAccount": "Não tem uma conta?",
+      "alreadyHaveAccount": "Já tem uma conta?",
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "name": "Nome",
+      "rememberMe": "Lembrar-me",
+      "directAccess": "Acessar Diretamente (Contorno)",
+      "loginSuccess": "Login realizado com sucesso",
+      "loginError": "Erro ao fazer login",
+      "registerSuccess": "Registro realizado com sucesso",
+      "registerError": "Erro ao registrar",
+      "logoutSuccess": "Logout realizado com sucesso"
+    },
+    "register": {
+      "title": "Criar uma conta",
+      "description": "Preencha os dados abaixo para criar sua conta",
+      "name": "Nome completo",
+      "username": "Nome de usuário",
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "submit": "Registrar",
+      "success": "Conta criada com sucesso!"
+    },
+    "sidebar": {
+      "dashboard": "Painel",
+      "expenses": "Despesas",
+      "income": "Receitas",
+      "investments": "Investimentos",
+      "goals": "Metas",
+      "alerts": "Alertas",
+      "reports": "Relatórios",
+      "preferences": "Preferências"
+    },
+    "categories": {
+      "title": "Categorias",
+      "newCategory": "Nova Categoria",
+      "name": "Nome",
+      "type": "Tipo",
+      "color": "Cor",
+      "icon": "Ícone",
+      "noCategories": "Nenhuma categoria encontrada",
+      "housing": "Moradia",
+      "marketAndHousing": "Mercado e Habitação",
+      "food": "Alimentação",
+      "transportation": "Transporte",
+      "healthWellness": "Saúde e Bem-estar",
+      "education": "Educação",
+      "entertainment": "Lazer e Entretenimento",
+      "clothing": "Vestuário e Cuidados Pessoais",
+      "homeServices": "Serviços Domésticos",
+      "pets": "Animais de Estimação",
+      "financial": "Despesas Financeiras",
+      "taxes": "Impostos e Taxas",
+      "salary": "Salário",
+      "freelance": "Freelance",
+      "investments": "Investimentos",
+      "bonus": "Bônus",
+      "other": "Outras Despesas",
+      "others": "Outros",
+      "uncategorized": "Sem categoria"
+    },
+    "transactions": {
+      "status": {
+        "paid": "Pago",
+        "pending": "Pendente",
+        "overdue": "Vencido",
+        "received": "Recebido"
+      }
+    },
+    "dashboard": {
+      "title": "Painel",
+      "summary": "Resumo",
+      "currentBalance": "Saldo Atual",
+      "monthlyIncome": "Receita Mensal",
+      "monthlyExpenses": "Despesas Mensais",
+      "totalInvestments": "Investimentos Totais",
+      "expensesByCategory": "Despesas por Categoria",
+      "balanceEvolution": "Evolução do Saldo",
+      "noTransactions": "Sem transações registradas", 
+      "charts": {
+        "noData": "Sem dados para exibir"
+      },
+      "transactions": {
+        "monthly": "Transações mensais",
+        "recent": "Transações recentes",
+        "viewAll": "Ver todas",
+        "title": "Transações",
+        "all": "Todas",
+        "incomes": "Receitas",
+        "expenses": "Despesas",
+        "description": "Descrição",
+        "category": "Categoria",
+        "date": "Data",
+        "amount": "Valor",
+        "status": {
+          "label": "Status",
+          "received": "Recebido",
+          "paid": "Pago",
+          "pending": "Pendente",
+          "overdue": "Vencido"
+        },
+        "filters": {
+          "all": "Todas",
+          "income": "Receitas",
+          "expense": "Despesas"
+        }
+      },
+      "upcomingBills": "Contas Próximas",
+      "goals": "Metas",
+      "notUpcomingBills": "Sem contas próximas",
+      "noUpcomingBills": "Sem contas próximas",
+      "noGoalsDefined": "Nenhuma meta definida",
+      "periods": {
+        "currentMonth": "Mês atual"
+      },
+      "previousMonth": "Mês anterior",
+      "upcomingTransactions": "Transações Futuras",
+      "noUpcomingTransactions": "Não há transações futuras nos próximos 7 dias",
+      "viewAll": "Ver Todas",
+      "recentTransactions": "Transações Recentes",
+      "loading": "Carregando dados",
+      "error": "Erro ao carregar dados",
+      "goalProgress": "Progresso de Metas",
+      "noGoals": "Não há metas cadastradas",
+      "createGoal": "Criar Meta"
+    },
+    
+    "common": {
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "loading": "Carregando...",
+      "saving": "Salvando...",
+      "search": "Pesquisar",
+      "noDataToDisplay": "Sem dados para exibir",
+      "viewAll": "Ver Todos",
+      "create": "Criar",
+      "update": "Atualizar",
+      "currentMonth": "Mês Atual",
+      "newTransaction": "Nova Transação",
+      "mesAtual": "Mês Atual",
+      "novaTransacao": "Nova Transação",
+      "filter": "Filtrar",
+      "yes": "Sim",
+      "no": "Não",
+      "confirm": "Confirmar",
+      "success": "Sucesso",
+      "error": "Erro",
+      "user": "Usuário",
+      "reloadTranslations": "Atualizar traduções"
+    },
+    
+    "expenses": {
+      "title": "Despesas",
+      "new": "Nova Despesa",
+      "add": "Adicionar Despesa",
+      "totalAmount": "Valor Total",
+      "totalPaid": "Total Pago",
+      "totalPending": "Total Pendente",
+      "edit": "Editar Despesa",
+      "deleted": "Despesa excluída",
+      "selectCategory": "Selecionar Categoria",
+      "statusPending": "Pendente",
+      "isRecurring": "É recorrente",
+      "due": "Vencimento",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Digite a descrição da despesa",
+      "amount": "Valor",
+      "amountPlaceholder": "0,00",
+      "category": "Categoria",
+      "date": "Data",
+      "dueDate": "Data de Vencimento",
+      "status": "Status",
+      "typeLabel": "Tipo",
+      "types": {
+        "variable": "Variável",
+        "fixed": "Fixa"
+      },
+      "recurring": "Recorrente",
+      "validation": {
+        "descriptionRequired": "A descrição é obrigatória",
+        "amountRequired": "O valor é obrigatório",
+        "categoryRequired": "A categoria é obrigatória",
+        "dateFormat": "Formato de data inválido (DD/MM/YYYY)",
+        "dueDateFormat": "Formato de data inválido (DD/MM/YYYY)"
+      },
+      "form": {
+        "description": "Descrição",
+        "descriptionPlaceholder": "Digite a descrição da despesa",
+        "amount": "Valor",
+        "amountPlaceholder": "0,00",
+        "category": "Categoria",
+        "categoryPlaceholder": "Selecione uma categoria",
+        "date": "Data",
+        "datePlaceholder": "DD/MM/AAAA",
+        "dueDate": "Data de Vencimento",
+        "dueDatePlaceholder": "DD/MM/AAAA",
+        "expenseType": "Tipo de Despesa",
+        "fixed": "Fixa",
+        "variable": "Variável",
+        "recurringExpense": "É uma despesa recorrente?",
+        "status": "Status",
+        "statusPending": "Pendente",
+        "statusPaid": "Pago",
+        "statusOverdue": "Vencido"
+      },
+      "list": "Lista de Despesas",
+      "filters": {
+        "all": "Todas",
+        "fixed": "Fixas",
+        "variable": "Variáveis"
+      },
+      "created": "Despesa criada",
+      "createdSuccess": "Despesa criada com sucesso",
+      "createError": "Erro ao criar despesa",
+      "updated": "Despesa atualizada",
+      "updatedSuccess": "Despesa atualizada com sucesso",
+      "updateError": "Erro ao atualizar despesa"
+    },
+    "income": {
+      "title": "Receitas",
+      "new": "Nova Receita",
+      "totalAmount": "Valor Total",
+      "totalReceived": "Total Recebido",
+      "totalPending": "Total Pendente",
+      "edit": "Editar Receita",
+      "deleted": "Receita excluída",
+      "validation": {
+        "descriptionRequired": "A descrição é obrigatória",
+        "amountRequired": "O valor é obrigatório",
+        "categoryRequired": "A categoria é obrigatória",
+        "dateRequired": "A data é obrigatória",
+        "dateFormat": "Formato de data inválido"
+      },
+      "form": {
+        "description": "Descrição",
+        "descriptionPlaceholder": "Digite a descrição da receita",
+        "amount": "Valor",
+        "amountPlaceholder": "0,00",
+        "category": "Categoria",
+        "categoryPlaceholder": "Selecione uma categoria",
+        "date": "Data",
+        "datePlaceholder": "DD/MM/AAAA",
+        "status": "Status",
+        "statusPending": "Pendente",
+        "statusReceived": "Recebido",
+        "recurring": "Recorrente"
+      },
+      "toast": {
+        "updateSuccess": "Receita atualizada",
+        "updateSuccessDescription": "Receita atualizada com sucesso",
+        "updateError": "Erro ao atualizar receita",
+        "createSuccess": "Receita adicionada",
+        "createSuccessDescription": "Receita adicionada com sucesso",
+        "createError": "Erro ao adicionar receita"
+      }
+    },
+
+    "goals": {
+      "title": "Metas",
+      "financialGoals": "Metas Financeiras",
+      "newGoal": "Nova Meta",
+      "createGoal": "Criar Meta",
+      "editGoal": "Editar Meta",
+      "noGoals": "Nenhuma meta cadastrada",
+      "startAddingGoals": "Comece adicionando suas metas financeiras",
+      "totalGoals": "Total em Metas",
+      "totalSaved": "Total Economizado",
+      "progress": "Progresso",
+      "saved": "Economizado",
+      "target": "Objetivo",
+      "remaining": "Restante",
+      "targetDate": "Data Alvo",
+      "addValue": "Adicionar Valor",
+      "enterAmount": "Digite o valor a adicionar",
+      "deleteConfirm": "Tem certeza que deseja excluir esta meta?",
+      "notFound": "Meta não encontrada",
+      "achieved": "Meta alcançada!",
+      "estimateMonths": "Com uma contribuição mensal de {{amount}}, você atingirá a meta em aproximadamente {{months}} meses.",
+      "estimateYearsMonths": "Com uma contribuição mensal de {{amount}}, você atingirá a meta em aproximadamente {{years}} anos e {{months}} meses.",
+      "deleteSuccess": {
+        "title": "Meta excluída",
+        "description": "Meta excluída com sucesso"
+      },
+      "deleteError": "Erro ao excluir meta",
+      "addValueSuccess": {
+        "title": "Valor adicionado",
+        "description": "Valor adicionado com sucesso"
+      },
+      "addValueError": "Erro ao adicionar valor",
+      "messages": {
+        "createSuccess": "Meta criada com sucesso",
+        "createError": "Erro ao criar meta",
+        "updateSuccess": "Meta atualizada com sucesso",
+        "updateError": "Erro ao atualizar meta"
+      },
+      "form": {
+        "name": "Nome da Meta",
+        "namePlaceholder": "Ex.: Viagem, Reserva de Emergência",
+        "targetAmount": "Valor do Objetivo",
+        "currentAmount": "Valor Atual",
+        "targetDate": "Data Alvo",
+        "description": "Descrição",
+        "descriptionPlaceholder": "Descreva sua meta (opcional)",
+        "monthlyContribution": "Contribuição Mensal",
+        "annualInterestRate": "Taxa de Juros Anual (%)",
+        "create": "Criar Meta"
+      },
+      "validation": {
+        "nameRequired": "O nome da meta é obrigatório",
+        "targetAmountRequired": "O valor do objetivo é obrigatório",
+        "contributionPositive": "A contribuição deve ser maior ou igual a 0",
+        "interestRateMin": "A taxa de juros deve ser maior ou igual a 0",
+        "interestRateMax": "A taxa de juros deve ser menor ou igual a 100"
+      }
+    },
+    "errors": {
+      "serverError": "Erro no servidor",
+      "notFound": "Página não encontrada",
+      "unauthorized": "Não autorizado",
+      "forbidden": "Acesso proibido",
+      "validationError": "Erro de validação",
+      "networkError": "Erro de rede",
+      "unknownError": "Erro desconhecido"
+    },
+    "investments": {
+      "title": "Investimentos",
+      "totalInvested": "Total Investido",
+      "newInvestment": "Novo Investimento",
+      "name": "Nome",
+      "namePlaceholder": "Digite o nome do investimento",
+      "type": "Tipo",
+      "selectType": "Selecione o tipo",
+      "types": {
+        "cdb": "CDB",
+        "lciLca": "LCI/LCA",
+        "tesouroDireto": "Tesouro Direto",
+        "funds": "Fundos de Investimento"
+      },
+      "amount": "Valor",
+      "amountPlaceholder": "0,00",
+      "date": "Data",
+      "interestRate": "Taxa de Juros",
+      "interestRatePlaceholder": "0,00%",
+      "maturityDate": "Data de Vencimento",
+      "simulator": "Simulador",
+      "simulate": "Simular",
+      "projectedValue": "Valor Projetado",
+      "editInvestment": "Editar Investimento",
+      "confirmDelete": "Tem certeza que deseja excluir este investimento?",
+      "createSuccess": {
+        "title": "Investimento adicionado",
+        "description": "Investimento adicionado com sucesso"
+      },
+      "createError": "Erro ao adicionar investimento",
+      "updateSuccess": {
+        "title": "Investimento atualizado",
+        "description": "Investimento atualizado com sucesso"
+      },
+      "updateError": "Erro ao atualizar investimento",
+      "simulationSuccess": {
+        "title": "Simulação concluída",
+        "description": "Simulação concluída com sucesso"
+      },
+      "simulationError": "Erro ao executar simulação",
+      "deleteSuccess": "Investimento excluído com sucesso",
+      "deleteError": "Erro ao excluir investimento"
+    },
+    "reports": {
+      "title": "Relatórios",
+      "export": "Exportar",
+      "filename": "relatorio_financeiro",
+      "noTransactions": "Sem transações registradas",
+      "period": {
+        "currentMonth": "Mês Atual",
+        "lastMonth": "Mês Anterior",
+        "description": "Descrição",
+        "category": "Categoria",
+        "type": "Tipo",
+        "amount": "Valor",
+        "status": "Status"
+      }
+    }
+  },
+  "initializeData": {
+    "title": "Inicializar Dados",
+    "description": "Você ainda não tem dados financeiros. Crie dados de exemplo para visualizar o funcionamento do sistema.",
+    "initialize": "Criar Dados de Exemplo",
+    "initializing": "Inicializando...",
+    "success": "Dados de exemplo criados com sucesso!",
+    "alreadyInitialized": "Os dados já foram inicializados anteriormente.",
+    "error": "Erro ao criar dados de exemplo",
+    "info": "Serão criadas categorias, transações, metas e investimentos de exemplo para demonstração."
+  }
+}

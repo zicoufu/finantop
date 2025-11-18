@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, AlertCircle } from "lucide-react";
+import { api } from "@/lib/api";
+import { formatCurrency } from "@/lib/currency";
+import { useTranslation } from "react-i18next";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -26,18 +29,28 @@ ChartJS.register(
   Filler
 );
 
-interface Transaction {
-  id: number;
-  description: string;
-  amount: string;
-  type: string;
-  date: string;
-  status: string;
+interface BalanceItem {
+  month: string;
+  income: number;
+  expenses: number;
+  balance: number;
+}
+
+interface ChartData {
+  expensesByCategory: {
+    name: string;
+    value: number;
+    color: string;
+  }[];
+  balanceEvolution: BalanceItem[];
+  hasData: boolean;
 }
 
 export default function BalanceChart() {
-  const { data: transactions, isLoading } = useQuery<Transaction[]>({
-    queryKey: ["/api/transactions"],
+  const { t } = useTranslation();
+  const { data: chartData, isLoading, isError } = useQuery<ChartData>({
+    queryKey: ["reports", "charts"],
+    queryFn: () => api("/api/reports/charts"),
   });
 
   if (isLoading) {
@@ -45,7 +58,7 @@ export default function BalanceChart() {
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader className="flex flex-row items-center justify-between pb-6">
           <CardTitle className="text-lg font-semibold text-gray-800">
-            Evolução do Saldo
+            {t('dashboard.balanceEvolution')}
           </CardTitle>
           <MoreVertical className="h-4 w-4 text-gray-400" />
         </CardHeader>
@@ -57,36 +70,111 @@ export default function BalanceChart() {
       </Card>
     );
   }
-
-  if (!transactions) {
+  
+  if (isError) {
     return (
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader>
-          <CardTitle>Evolução do Saldo</CardTitle>
+          <CardTitle>{t('dashboard.balanceEvolution')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-64 flex items-center justify-center text-gray-500">
-            Nenhum dado disponível
+          <div className="h-64 flex items-center justify-center text-gray-500 flex-col">
+            <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
+            <p>{t('dashboard.charts.errorLoading')}</p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  // Generate mock balance evolution data since we don't have historical data
-  const months = [
-    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
-  ];
+  if (!chartData || !chartData.hasData || chartData.balanceEvolution.length === 0) {
+    return (
+      <Card className="bg-white shadow-sm border border-gray-200">
+        <CardHeader>
+          <CardTitle>{t('dashboard.balanceEvolution')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64 flex items-center justify-center text-gray-500">
+            {t('dashboard.charts.noData')}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-  // For demo purposes, generate some balance evolution data
-  const balanceData = [12000, 13500, 12800, 14200, 13900, 15100, 14600, 15800, 15200, 16100, 15900, 15432];
+  // Usar os dados de evolução de saldo da API
+  const balanceEvolution = chartData.balanceEvolution;
+  
+  // Função para traduzir os nomes dos meses
+  const translateMonth = (month: string) => {
+    // Extrair o nome do mês e o ano (assumindo formato "mmm. de yyyy" ou similar)
+    const monthMatch = month.match(/^([a-zA-Zçãõáéíóúâêîôûàèìòù]+)\. de (\d{4})$/i);
+    if (monthMatch && monthMatch[1] && monthMatch[2]) {
+      const monthAbbr = monthMatch[1].toLowerCase();
+      const year = monthMatch[2];
+      
+      // Mapear abreviações em português para chaves de tradução
+      const monthMap: Record<string, string> = {
+        'jan': 'jan',
+        'fev': 'feb',
+        'mar': 'mar',
+        'abr': 'apr',
+        'mai': 'may',
+        'jun': 'jun',
+        'jul': 'jul',
+        'ago': 'aug',
+        'set': 'sep',
+        'out': 'oct',
+        'nov': 'nov',
+        'dez': 'dec'
+      };
+      
+      const key = monthMap[monthAbbr] || monthAbbr;
+      const translatedMonth = t(`months.${key}`);
+      
+      // Retornar o formato traduzido: "Jan 2025" em vez de "jan. de 2025"
+      return `${translatedMonth} ${year}`;
+    }
+    
+    // Tentar apenas traduzir a abreviação do mês se o formato completo não for reconhecido
+    const simpleMonthMatch = month.match(/^([a-zA-Zçãõáéíóúâêîôûàèìòù]+)\./i);
+    if (simpleMonthMatch && simpleMonthMatch[1]) {
+      const monthAbbr = simpleMonthMatch[1].toLowerCase();
+      
+      const monthMap: Record<string, string> = {
+        'jan': 'jan',
+        'fev': 'feb',
+        'mar': 'mar',
+        'abr': 'apr',
+        'mai': 'may',
+        'jun': 'jun',
+        'jul': 'jul',
+        'ago': 'aug',
+        'set': 'sep',
+        'out': 'oct',
+        'nov': 'nov',
+        'dez': 'dec'
+      };
+      
+      const key = monthMap[monthAbbr] || monthAbbr;
+      const translatedMonth = t(`months.${key}`);
+      
+      return month.replace(simpleMonthMatch[1], translatedMonth);
+    }
+    
+    return month; // Retornar o original se não conseguir traduzir
+  };
+  
+  const months = balanceEvolution.map(item => translateMonth(item.month));
+  const balanceData = balanceEvolution.map(item => item.balance);
+  const incomeData = balanceEvolution.map(item => item.income);
+  const expenseData = balanceEvolution.map(item => item.expenses);
 
-  const chartData = {
+  const chartDataConfig = {
     labels: months,
     datasets: [
       {
-        label: 'Saldo',
+        label: t('dashboard.charts.balance'),
         data: balanceData,
         borderColor: 'hsl(214, 84%, 56%)',
         backgroundColor: 'hsla(214, 84%, 56%, 0.1)',
@@ -96,8 +184,34 @@ export default function BalanceChart() {
         pointRadius: 6,
         pointHoverRadius: 8,
         pointBackgroundColor: 'hsl(214, 84%, 56%)',
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 2,
+      },
+      {
+        label: t('dashboard.charts.income'),
+        data: incomeData,
+        borderColor: 'hsl(142, 76%, 36%)',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [5, 5],
+        fill: false,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: 'hsl(142, 76%, 36%)',
+        hidden: true,
+      },
+      {
+        label: t('dashboard.charts.expenses'),
+        data: expenseData,
+        borderColor: 'hsl(0, 84%, 60%)',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [5, 5],
+        fill: false,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: 'hsl(0, 84%, 60%)',
+        hidden: true,
       },
     ],
   };
@@ -112,7 +226,9 @@ export default function BalanceChart() {
       tooltip: {
         callbacks: {
           label: function(context: any) {
-            return `Saldo: R$ ${context.parsed.y.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            // Usar formatCurrency para garantir consistência na formatação de moeda
+            const formattedValue = formatCurrency(context.parsed.y);
+            return `${t('common.balance')}: ${formattedValue}`;
           },
         },
       },
@@ -122,7 +238,8 @@ export default function BalanceChart() {
         beginAtZero: false,
         ticks: {
           callback: function(value: any) {
-            return `R$ ${value.toLocaleString('pt-BR')}`;
+            // Usar formatCurrency para garantir consistência na formatação de moeda
+            return formatCurrency(value);
           },
           font: {
             family: 'Inter',
@@ -149,15 +266,15 @@ export default function BalanceChart() {
     <Card className="bg-white shadow-sm border border-gray-200">
       <CardHeader className="flex flex-row items-center justify-between pb-6">
         <CardTitle className="text-lg font-semibold text-gray-800">
-          Evolução do Saldo
+          {t('dashboard.balanceEvolution')}
         </CardTitle>
-        <button className="text-gray-400 hover:text-gray-600">
+        <button className="text-gray-400 hover:text-gray-600" aria-label={t('dashboard.charts.balanceOptions')}>
           <MoreVertical className="h-4 w-4" />
         </button>
       </CardHeader>
       <CardContent>
         <div className="h-64">
-          <Line data={chartData} options={options} />
+          <Line data={chartDataConfig as any} options={options} />
         </div>
       </CardContent>
     </Card>

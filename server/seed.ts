@@ -1,18 +1,21 @@
-import { db } from "./db";
-import { users, categories, transactions } from "@shared/schema";
+import { db } from "./db.js";
+import { users, categories, transactions } from "../shared/schema.js";
+import { eq } from "drizzle-orm";
 
 async function seed() {
   console.log("Seeding database...");
 
   // Create demo user
-  const [demoUser] = await db.insert(users).values({
+  const userResult = await db.insert(users).values({
     username: "demo",
     password: "demo123",
     name: "João Silva",
     email: "joao@example.com"
-  }).returning();
+  }).execute();
 
-  console.log("Created demo user:", demoUser.id);
+  // Drizzle MySQL não retorna o usuário diretamente, então busque pelo e-mail
+  const [demoUser] = await db.select().from(users).where(eq(users.email, "joao@example.com"));
+  console.log("Created demo user:", demoUser?.id);
 
   // Default expense categories
   const expenseCategories = [
@@ -33,19 +36,21 @@ async function seed() {
     { name: "Outros", type: "income", color: "#6b7280", icon: "fas fa-coins", userId: demoUser.id },
   ];
 
-  const insertedCategories = await db.insert(categories).values([
+  await db.insert(categories).values([
     ...expenseCategories,
     ...incomeCategories
-  ]).returning();
+  ]).execute();
 
+  // Buscar categorias do usuário demo
+  const insertedCategories = await db.select().from(categories);
   console.log("Created categories:", insertedCategories.length);
 
   // Find category IDs for sample transactions
-  const alimentacao = insertedCategories.find(c => c.name === "Alimentação");
-  const transporte = insertedCategories.find(c => c.name === "Transporte");
-  const moradia = insertedCategories.find(c => c.name === "Moradia");
-  const lazer = insertedCategories.find(c => c.name === "Lazer");
-  const outros = insertedCategories.find(c => c.name === "Outros" && c.type === "expense");
+  const alimentacao = insertedCategories.find((c: any) => c.name === "Alimentação");
+  const transporte = insertedCategories.find((c: any) => c.name === "Transporte");
+  const moradia = insertedCategories.find((c: any) => c.name === "Moradia");
+  const lazer = insertedCategories.find((c: any) => c.name === "Lazer");
+  const outros = insertedCategories.find((c: any) => c.name === "Outros" && c.type === "expense");
 
   // Add sample transactions with expense types
   const sampleTransactions = [
@@ -53,7 +58,7 @@ async function seed() {
     {
       description: "Aluguel",
       amount: "1200.00",
-      date: "2025-06-01",
+      date: new Date("2025-06-01"),
       type: "expense",
       categoryId: moradia!.id,
       status: "paid",
@@ -65,7 +70,7 @@ async function seed() {
     {
       description: "Conta de Internet",
       amount: "89.90",
-      date: "2025-06-05",
+      date: new Date("2025-06-05"),
       type: "expense",
       categoryId: outros!.id,
       status: "paid",
@@ -77,20 +82,20 @@ async function seed() {
     {
       description: "Seguro do Carro",
       amount: "350.00",
-      date: "2025-06-10",
+      date: new Date("2025-06-10"),
       type: "expense",
       categoryId: transporte!.id,
       status: "pending",
       isRecurring: true,
       expenseType: "fixed",
-      dueDate: "2025-06-15",
+      dueDate: new Date("2025-06-15"),
       userId: demoUser.id
     },
     // Variable expenses
     {
       description: "Supermercado",
       amount: "250.75",
-      date: "2025-06-08",
+      date: new Date("2025-06-08"),
       type: "expense",
       categoryId: alimentacao!.id,
       status: "paid",
@@ -102,7 +107,7 @@ async function seed() {
     {
       description: "Cinema",
       amount: "35.00",
-      date: "2025-06-11",
+      date: new Date("2025-06-11"),
       type: "expense",
       categoryId: lazer!.id,
       status: "paid",
@@ -114,7 +119,7 @@ async function seed() {
     {
       description: "Combustível",
       amount: "120.00",
-      date: "2025-06-12",
+      date: new Date("2025-06-12"),
       type: "expense",
       categoryId: transporte!.id,
       status: "paid",
@@ -125,9 +130,9 @@ async function seed() {
     }
   ];
 
-  const insertedTransactions = await db.insert(transactions).values(sampleTransactions).returning();
+  await db.insert(transactions).values(sampleTransactions).execute();
 
-  console.log("Created sample transactions:", insertedTransactions.length);
+  console.log("Created sample transactions.");
   console.log("Database seeded successfully!");
 }
 

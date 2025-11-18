@@ -1,0 +1,91 @@
+{
+  "translation": {
+    "expenses": {
+      "title": "Expenses",
+      "newExpense": "New Expense",
+      "addExpense": "Add Expense",
+      "editExpense": "Edit Expense",
+      "totalPaid": "Total Paid",
+      "pending": "Pending",
+      "fixed": "Fixed",
+      "variable": "Variable",
+      "expenseList": "Expense List",
+      "allExpenses": "All Expenses",
+      "fixedExpenses": "Fixed Expenses",
+      "variableExpenses": "Variable Expenses",
+      "noExpenses": "No expenses found",
+      "startAddingExpense": "Start by adding your first expense.",
+      "deleteConfirm": "Are you sure you want to delete this expense?",
+      "expenseDeleted": "Expense deleted",
+      "expenseDeletedDesc": "The expense was successfully deleted.",
+      "statusUpdated": "Status updated",
+      "statusUpdatedDesc": "The expense status was successfully updated.",
+      "errorLoading": "Error loading expenses",
+      "errorDeleting": "Could not delete expense.",
+      "errorUpdating": "Could not update expense status.",
+      "dueDate": "Due"
+    },
+    "income": {
+      "title": "Income",
+      "newIncome": "New Income",
+      "addIncome": "Add Income",
+      "editIncome": "Edit Income",
+      "totalReceived": "Total Received",
+      "pending": "Pending",
+      "incomeList": "Income List",
+      "noIncome": "No income found",
+      "startAddingIncome": "Start by adding your first income."
+    },
+    "investments": {
+      "title": "Investments",
+      "newInvestment": "New Investment",
+      "addInvestment": "Add Investment",
+      "editInvestment": "Edit Investment",
+      "totalInvested": "Total Invested",
+      "portfolio": "Portfolio",
+      "simulator": "Simulator",
+      "myInvestments": "My Investments",
+      "noInvestments": "No investments found",
+      "startAddingInvestments": "Start by adding your first investments."
+    },
+    "goals": {
+      "title": "Financial Goals",
+      "newGoal": "New Goal",
+      "addGoal": "Add Goal",
+      "editGoal": "Edit Goal",
+      "totalGoals": "Total Goals",
+      "totalSaved": "Total Saved",
+      "progress": "Progress",
+      "saved": "Saved",
+      "target": "Target",
+      "remaining": "Remaining",
+      "addValue": "Add Value",
+      "estimate": "Estimate",
+      "months": "months",
+      "finalValue": "Final value"
+    },
+    "alerts": {
+      "title": "Alerts",
+      "unreadAlerts": "You have {count} unread alert(s)",
+      "unread": "Unread",
+      "all": "All",
+      "dueDate": "Due Date",
+      "new": "New",
+      "expiresToday": "The expense '{expense}' is due today"
+    },
+    "reports": {
+      "title": "Reports",
+      "thisMonth": "This month",
+      "export": "Export",
+      "overview": "Overview",
+      "detailed": "Detailed",
+      "income": "Income",
+      "expenses": "Expenses",
+      "balance": "Balance",
+      "goalsProgress": "Goals Progress",
+      "expensesByCategory": "Expenses by Category",
+      "incomeVsExpenses": "Income vs Expenses",
+      "months": "months"
+    }
+  }
+}

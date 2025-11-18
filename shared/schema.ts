@@ -1,119 +1,242 @@
-import { pgTable, text, serial, integer, boolean, timestamp, decimal, date } from "drizzle-orm/pg-core";
+import { mysqlTable, text, int, boolean, timestamp, decimal, date, datetime } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+export const users = mysqlTable("users", {
+  id: int("id").primaryKey().autoincrement(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
-export const categories = pgTable("categories", {
-  id: serial("id").primaryKey(),
+export const categories = mysqlTable("categories", {
+  id: int("id").primaryKey().autoincrement(),
   name: text("name").notNull(),
   type: text("type").notNull(), // 'expense' or 'income'
   color: text("color").notNull(),
   icon: text("icon").notNull(),
-  userId: integer("user_id").references(() => users.id).notNull(),
-});
+  userId: int("user_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
+}, (table) => ({
+  userReference: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+    name: 'categories_user_id_fk',
+  })
+}));
 
-export const transactions = pgTable("transactions", {
-  id: serial("id").primaryKey(),
+export const transactions = mysqlTable("transactions", {
+  id: int("id").primaryKey().autoincrement(),
   description: text("description").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   date: date("date").notNull(),
   type: text("type").notNull(), // 'expense' or 'income'
-  categoryId: integer("category_id").references(() => categories.id).notNull(),
+  categoryId: int("category_id").notNull(),
   status: text("status").notNull(), // 'pending', 'paid', 'received', 'overdue'
   isRecurring: boolean("is_recurring").default(false).notNull(),
   expenseType: text("expense_type"), // 'fixed' or 'variable' (only for expenses)
   dueDate: date("due_date"),
-  userId: integer("user_id").references(() => users.id).notNull(),
+  userId: int("user_id").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+  updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
+}, (table) => ({
+  categoryReference: foreignKey({
+    columns: [table.categoryId],
+    foreignColumns: [categories.id],
+    name: 'transactions_category_id_fk',
+  }),
+  userReference: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+    name: 'transactions_user_id_fk',
+  })
+}));
 
-export const goals = pgTable("goals", {
-  id: serial("id").primaryKey(),
+export const goals = mysqlTable("goals", {
+  id: int("id").primaryKey().autoincrement(),
   name: text("name").notNull(),
   targetAmount: decimal("target_amount", { precision: 10, scale: 2 }).notNull(),
   currentAmount: decimal("current_amount", { precision: 10, scale: 2 }).default('0').notNull(),
   targetDate: date("target_date"),
+  monthlyContribution: decimal("monthly_contribution", { precision: 10, scale: 2 }).default('0').notNull(),
+  annualInterestRate: decimal("annual_interest_rate", { precision: 5, scale: 2 }).default('0').notNull(), // e.g., 5.00 for 5%
   description: text("description"),
-  userId: integer("user_id").references(() => users.id).notNull(),
+  userId: int("user_id").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+  updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
+}, (table) => ({
+  userReference: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+    name: 'goals_user_id_fk',
+  })
+}));
 
-export const investments = pgTable("investments", {
-  id: serial("id").primaryKey(),
+// Helper function for foreign key constraints
+function foreignKey(config: {
+  columns: any[];
+  foreignColumns: any[];
+  name?: string;
+}) {
+  return {
+    columns: config.columns,
+    foreignColumns: config.foreignColumns,
+    name: config.name,
+  };
+}
+
+export const investments = mysqlTable("investments", {
+  id: int("id").primaryKey().autoincrement(),
   name: text("name").notNull(),
   type: text("type").notNull(), // 'cdb', 'lci_lca', 'tesouro_direto', 'funds'
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   interestRate: decimal("interest_rate", { precision: 5, scale: 2 }).notNull(),
   startDate: date("start_date").notNull(),
   maturityDate: date("maturity_date"),
-  userId: integer("user_id").references(() => users.id).notNull(),
+  userId: int("user_id").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+  updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
+}, (table) => ({
+  userReference: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+    name: 'investments_user_id_fk',
+  })
+}));
 
-export const alerts = pgTable("alerts", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
+export const alerts = mysqlTable("alerts", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").notNull(),
+  type: text("type").notNull(), // 'bill_due', 'goal_achieved', 'unusual_spending'
   message: text("message").notNull(),
-  type: text("type").notNull(), // 'due_date', 'overdue', 'goal_milestone', 'investment_maturity'
   isRead: boolean("is_read").default(false).notNull(),
-  relatedId: integer("related_id"), // references transaction.id or goal.id or investment.id
-  userId: integer("user_id").references(() => users.id).notNull(),
+  referenceId: int("reference_id"),
+  referenceType: text("reference_type"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+  updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
+}, (table) => ({
+  userReference: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+    name: 'alerts_user_id_fk',
+  })
+}));
 
-// Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  createdAt: true,
-});
+export const userPreferences = mysqlTable("user_preferences", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").notNull(),
+  language: text("language").default("pt-BR").notNull(),
+  theme: text("theme").default("light").notNull(),
+  currency: text("currency").default("BRL").notNull(),
+  dateFormat: text("date_format").default("DD/MM/YYYY").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
+}, (table) => ({
+  userReference: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+    name: 'user_preferences_user_id_fk',
+  })
+}));
 
-export const insertCategorySchema = createInsertSchema(categories).omit({
-  id: true,
-});
+// Schemas for form validation
+// Esquema de validação de usuário com senha forte
+export const insertUserSchema = createInsertSchema(users)
+  .extend({
+    password: z.string()
+      .min(8, { message: "A senha deve ter pelo menos 8 caracteres" })
+      .refine(
+        (password) => /[A-Z]/.test(password),
+        { message: "A senha deve conter pelo menos uma letra maiúscula" }
+      )
+      .refine(
+        (password) => /[a-z]/.test(password),
+        { message: "A senha deve conter pelo menos uma letra minúscula" }
+      )
+      .refine(
+        (password) => /[0-9]/.test(password),
+        { message: "A senha deve conter pelo menos um número" }
+      )
+      .refine(
+        (password) => /[^A-Za-z0-9]/.test(password),
+        { message: "A senha deve conter pelo menos um caractere especial" }
+      )
+  })
+  .omit({ id: true, createdAt: true, updatedAt: true });
+export const insertCategorySchema = createInsertSchema(categories).omit({ id: true, createdAt: true, updatedAt: true });
 
-export const insertTransactionSchema = createInsertSchema(transactions).omit({
-  id: true,
-  createdAt: true,
-});
+export const insertGoalSchema = createInsertSchema(goals, {
+  targetDate: z.coerce.date().optional().nullable(),
+  targetAmount: z.string().refine(value => !isNaN(parseFloat(value)), { message: "Valor alvo deve ser um número válido" }),
+  currentAmount: z.string().optional().default('0').refine(value => !isNaN(parseFloat(value)), { message: "Valor atual deve ser um número válido" }),
+  monthlyContribution: z.string().optional().default('0').refine(value => !isNaN(parseFloat(value)), { message: "Contribuição mensal deve ser um número válido" }),
+  annualInterestRate: z.string().optional().default('0').refine(value => !isNaN(parseFloat(value)), { message: "Taxa de juros anual deve ser um número válido" }),
+}).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertInvestmentSchema = createInsertSchema(investments, {
+  startDate: z.coerce.date(), // Garante a conversão de string para Date
+  maturityDate: z.coerce.date().optional().nullable(), // Garante a conversão e mantém opcional
+  amount: z.string().refine(value => !isNaN(parseFloat(value)), { message: "Valor do investimento deve ser um número válido" }),
+  interestRate: z.string().refine(value => !isNaN(parseFloat(value)), { message: "Taxa de juros deve ser um número válido" }),
+}).omit({ id: true, createdAt: true, updatedAt: true });
 
-export const insertGoalSchema = createInsertSchema(goals).omit({
-  id: true,
-  createdAt: true,
-});
+export const updateInvestmentSchema = insertInvestmentSchema.partial();
 
-export const insertInvestmentSchema = createInsertSchema(investments).omit({
-  id: true,
-  createdAt: true,
-});
+export const insertTransactionSchema = createInsertSchema(transactions, {
+  date: z.coerce.date(),
+  dueDate: z.coerce.date().optional().nullable(),
+  // amount: z.string().refine(value => !isNaN(parseFloat(value)), { message: "Amount must be a valid number string" }).transform(value => parseFloat(value).toFixed(2)),
+  // categoryId, userId já são inferidos como number e notNull, o que é bom.
+}).omit({ id: true, createdAt: true, updatedAt: true });
 
-export const insertAlertSchema = createInsertSchema(alerts).omit({
-  id: true,
-  createdAt: true,
-});
+export const updateTransactionSchema = insertTransactionSchema.partial();
+
+export const insertAlertSchema = createInsertSchema(alerts).omit({ id: true, createdAt: true, updatedAt: true });
+
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences, {
+  language: z.enum(["pt-BR", "en-US", "es"]).default("pt-BR"),
+  theme: z.enum(["light", "dark", "system"]).default("light"),
+  currency: z.enum(["BRL", "USD", "EUR"]).default("BRL"),
+  dateFormat: z.enum(["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"]).default("DD/MM/YYYY"),
+}).omit({ id: true, createdAt: true, updatedAt: true });
+
+export const updateUserPreferencesSchema = insertUserPreferencesSchema.partial();
 
 // Types
 export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertUser = typeof users.$inferInsert;
 
 export type Category = typeof categories.$inferSelect;
-export type InsertCategory = z.infer<typeof insertCategorySchema>;
+export type InsertCategory = typeof categories.$inferInsert;
 
 export type Transaction = typeof transactions.$inferSelect;
-export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+export type InsertTransaction = typeof transactions.$inferInsert;
 
 export type Goal = typeof goals.$inferSelect;
-export type InsertGoal = z.infer<typeof insertGoalSchema>;
+export type InsertGoal = typeof goals.$inferInsert;
 
 export type Investment = typeof investments.$inferSelect;
-export type InsertInvestment = z.infer<typeof insertInvestmentSchema>;
+export type InsertInvestment = typeof investments.$inferInsert;
 
 export type Alert = typeof alerts.$inferSelect;
-export type InsertAlert = z.infer<typeof insertAlertSchema>;
+export type InsertAlert = typeof alerts.$inferInsert;
+
+export type UserPreference = typeof userPreferences.$inferSelect;
+export type InsertUserPreference = typeof userPreferences.$inferInsert;
+
+// Zod-inferred types for validated data (after Zod parsing/coercion)
+export type ValidatedInsertUser = z.infer<typeof insertUserSchema>;
+export type ValidatedInsertCategory = z.infer<typeof insertCategorySchema>;
+export type ValidatedInsertTransaction = z.infer<typeof insertTransactionSchema>;
+export type ValidatedInsertGoal = z.infer<typeof insertGoalSchema>;
+export type ValidatedInsertInvestment = z.infer<typeof insertInvestmentSchema>;
+export type ValidatedInsertAlert = z.infer<typeof insertAlertSchema>;
+export type ValidatedInsertUserPreference = z.infer<typeof insertUserPreferencesSchema>;
+export type ValidatedUpdateUserPreference = z.infer<typeof updateUserPreferencesSchema>;
+
+export type ValidatedUpdateTransaction = z.infer<typeof updateTransactionSchema>;
+export type ValidatedUpdateInvestment = z.infer<typeof updateInvestmentSchema>;
+// For other updates, you might use Partial<ValidatedInsertType> if a specific update schema doesn't exist

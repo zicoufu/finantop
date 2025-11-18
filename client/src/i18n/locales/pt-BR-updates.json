@@ -1,0 +1,91 @@
+{
+  "translation": {
+    "expenses": {
+      "title": "Despesas",
+      "newExpense": "Nova Despesa",
+      "addExpense": "Adicionar Despesa",
+      "editExpense": "Editar Despesa",
+      "totalPaid": "Total Pago",
+      "pending": "Pendente",
+      "fixed": "Fixas",
+      "variable": "Variáveis",
+      "expenseList": "Lista de Despesas",
+      "allExpenses": "Todas as Despesas",
+      "fixedExpenses": "Despesas Fixas",
+      "variableExpenses": "Despesas Variáveis",
+      "noExpenses": "Nenhuma despesa cadastrada",
+      "startAddingExpense": "Comece adicionando sua primeira despesa.",
+      "deleteConfirm": "Tem certeza que deseja excluir esta despesa?",
+      "expenseDeleted": "Despesa excluída",
+      "expenseDeletedDesc": "A despesa foi excluída com sucesso.",
+      "statusUpdated": "Status atualizado",
+      "statusUpdatedDesc": "O status da despesa foi atualizado com sucesso.",
+      "errorLoading": "Erro ao carregar despesas",
+      "errorDeleting": "Não foi possível excluir a despesa.",
+      "errorUpdating": "Não foi possível atualizar o status da despesa.",
+      "dueDate": "Vence"
+    },
+    "income": {
+      "title": "Receitas",
+      "newIncome": "Nova Receita",
+      "addIncome": "Adicionar Receita",
+      "editIncome": "Editar Receita",
+      "totalReceived": "Total Recebido",
+      "pending": "Pendente",
+      "incomeList": "Lista de Receitas",
+      "noIncome": "Nenhuma receita cadastrada",
+      "startAddingIncome": "Comece adicionando sua primeira receita."
+    },
+    "investments": {
+      "title": "Investimentos",
+      "newInvestment": "Novo Investimento",
+      "addInvestment": "Adicionar Investimento",
+      "editInvestment": "Editar Investimento",
+      "totalInvested": "Total Investido",
+      "portfolio": "Portfolio",
+      "simulator": "Simulador",
+      "myInvestments": "Meus Investimentos",
+      "noInvestments": "Nenhum investimento cadastrado",
+      "startAddingInvestments": "Comece adicionando seus primeiros investimentos."
+    },
+    "goals": {
+      "title": "Metas Financeiras",
+      "newGoal": "Nova Meta",
+      "addGoal": "Adicionar Meta",
+      "editGoal": "Editar Meta",
+      "totalGoals": "Total das Metas",
+      "totalSaved": "Total Economizado",
+      "progress": "Progresso",
+      "saved": "Economizado",
+      "target": "Meta",
+      "remaining": "Restante",
+      "addValue": "Adicionar Valor",
+      "estimate": "Estimativa",
+      "months": "meses",
+      "finalValue": "Valor final"
+    },
+    "alerts": {
+      "title": "Alertas",
+      "unreadAlerts": "Você tem {count} alerta(s) não lido(s)",
+      "unread": "Não Lidos",
+      "all": "Todos",
+      "dueDate": "Vencimento",
+      "new": "Novo",
+      "expiresToday": "A despesa '{expense}' vence hoje"
+    },
+    "reports": {
+      "title": "Relatórios",
+      "thisMonth": "Este mês",
+      "export": "Exportar",
+      "overview": "Visão Geral",
+      "detailed": "Detalhado",
+      "income": "Receitas",
+      "expenses": "Despesas",
+      "balance": "Saldo",
+      "goalsProgress": "Progresso Metas",
+      "expensesByCategory": "Despesas por Categoria",
+      "incomeVsExpenses": "Receitas vs Despesas",
+      "months": "meses"
+    }
+  }
+}

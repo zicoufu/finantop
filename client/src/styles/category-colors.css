@@ -1,0 +1,21 @@
+/* Category indicator base style */
+.category-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Category color classes - these should match the colors returned by getCategoryColor function */
+.category-color-1 { background-color: #3b82f6; } /* blue-500 */
+.category-color-2 { background-color: #ef4444; } /* red-500 */
+.category-color-3 { background-color: #10b981; } /* emerald-500 */
+.category-color-4 { background-color: #f59e0b; } /* amber-500 */
+.category-color-5 { background-color: #8b5cf6; } /* violet-500 */
+.category-color-6 { background-color: #ec4899; } /* pink-500 */
+.category-color-7 { background-color: #6366f1; } /* indigo-500 */
+.category-color-8 { background-color: #14b8a6; } /* teal-500 */
+.category-color-9 { background-color: #f97316; } /* orange-500 */
+.category-color-10 { background-color: #a855f7; } /* purple-500 */
+/* Default color for any other category IDs */
+.category-color-default { background-color: #9ca3af; } /* gray-400 */

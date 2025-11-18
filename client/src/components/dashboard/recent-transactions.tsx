@@ -6,7 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/currency";
 import { formatDate } from "@/lib/date";
+import { api } from "@/lib/api";
 import { Briefcase, ShoppingCart, Car, Home, Utensils } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Transaction {
   id: number;
@@ -34,14 +36,17 @@ const iconMap: { [key: string]: any } = {
 };
 
 export default function RecentTransactions() {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<"all" | "income" | "expense">("all");
 
   const { data: transactions, isLoading: transactionsLoading } = useQuery<Transaction[]>({
-    queryKey: ["/api/transactions"],
+    queryKey: ["transactions"],
+    queryFn: () => api("/api/transactions"),
   });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
-    queryKey: ["/api/categories"],
+    queryKey: ["categories"],
+    queryFn: () => api("/api/categories"),
   });
 
   const isLoading = transactionsLoading || categoriesLoading;
@@ -51,7 +56,7 @@ export default function RecentTransactions() {
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader className="flex items-center justify-between pb-6">
           <CardTitle className="text-lg font-semibold text-gray-800">
-            Transações Recentes
+            {t('dashboard.recentTransactions')}
           </CardTitle>
           <div className="flex space-x-2">
             {["Todas", "Receitas", "Despesas"].map((label) => (
@@ -64,11 +69,11 @@ export default function RecentTransactions() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Descrição</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Categoria</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Data</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Valor</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-600">Status</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">{t('transactions.description')}</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">{t('transactions.category')}</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">{t('transactions.date')}</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">{t('transactions.amount')}</th>
+                  <th className="text-center py-3 px-4 font-medium text-gray-600">{t('transactions.status.label')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -106,11 +111,11 @@ export default function RecentTransactions() {
     return (
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader>
-          <CardTitle>Transações Recentes</CardTitle>
+          <CardTitle>{t('dashboard.recentTransactions')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
-            Nenhuma transação encontrada
+            {t('dashboard.noTransactions')}
           </div>
         </CardContent>
       </Card>
@@ -122,8 +127,78 @@ export default function RecentTransactions() {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 10);
 
+  // Function to translate category names
+  const translateCategoryName = (categoryName: string): string => {
+    // Direct mapping for exact category names
+    const exactCategoryMap: Record<string, string> = {
+      "Moradia e Habitação": "housing",
+      "Alimentação": "food",
+      "Transporte": "transportation",
+      "Saúde e Bem-estar": "healthWellness",
+      "Educação": "education",
+      "Entretenimento": "entertainment",
+      "Vestuário e Cuidados Pessoais": "clothing",
+      "Serviços Domésticos": "homeServices",
+      "Animais de Estimação": "pets",
+      "Despesas Financeiras": "financial",
+      "Impostos e Taxas": "taxes",
+      "Outras Despesas": "other",
+      "Salário": "salary",
+      "Freelance": "freelance",
+      "Investimentos": "investments",
+      "Bônus": "bonus",
+      "Outros": "others"
+    };
+    
+    // Check for exact match first
+    if (exactCategoryMap[categoryName]) {
+      return t(`categories.${exactCategoryMap[categoryName]}`);
+    }
+    
+    // If no exact match, try pattern matching
+    const normalizedName = categoryName.toLowerCase();
+    
+    if (normalizedName.includes('moradia') || normalizedName.includes('habitação')) {
+      return t('categories.housing');
+    } else if (normalizedName.includes('alimentação')) {
+      return t('categories.food');
+    } else if (normalizedName.includes('transporte')) {
+      return t('categories.transportation');
+    } else if (normalizedName.includes('saúde') || normalizedName.includes('bem-estar')) {
+      return t('categories.healthWellness');
+    } else if (normalizedName.includes('educação')) {
+      return t('categories.education');
+    } else if (normalizedName.includes('lazer') || normalizedName.includes('entretenimento')) {
+      return t('categories.entertainment');
+    } else if (normalizedName.includes('vestuário') || normalizedName.includes('cuidados pessoais')) {
+      return t('categories.clothing');
+    } else if (normalizedName.includes('serviços domésticos')) {
+      return t('categories.homeServices');
+    } else if (normalizedName.includes('animais') || normalizedName.includes('pet')) {
+      return t('categories.pets');
+    } else if (normalizedName.includes('financeira')) {
+      return t('categories.financial');
+    } else if (normalizedName.includes('impostos') || normalizedName.includes('taxas')) {
+      return t('categories.taxes');
+    } else if (normalizedName.includes('salário')) {
+      return t('categories.salary');
+    } else if (normalizedName.includes('freelance')) {
+      return t('categories.freelance');
+    } else if (normalizedName.includes('investimento')) {
+      return t('categories.investments');
+    } else if (normalizedName.includes('bônus') || normalizedName.includes('bonus')) {
+      return t('categories.bonus');
+    } else if (normalizedName.includes('outro')) {
+      return t('categories.others');
+    } else {
+      // Try to find a matching category key or return the original name
+      return t(`categories.${normalizedName}`, { defaultValue: categoryName });
+    }
+  };
+  
   const getCategoryName = (categoryId: number): string => {
-    return categories.find(c => c.id === categoryId)?.name || "Outros";
+    const categoryName = categories.find(c => c.id === categoryId)?.name || t('categories.others');
+    return translateCategoryName(categoryName);
   };
 
   const getCategoryIcon = (categoryId: number) => {
@@ -155,13 +230,13 @@ export default function RecentTransactions() {
   const getStatusText = (status: string, type: string) => {
     switch (status) {
       case 'received':
-        return 'Recebido';
+        return t('transactions.status.received');
       case 'paid':
-        return 'Pago';
+        return t('transactions.status.paid');
       case 'pending':
-        return 'Pendente';
+        return t('transactions.status.pending');
       case 'overdue':
-        return 'Vencido';
+        return t('transactions.status.overdue');
       default:
         return status;
     }
@@ -171,7 +246,7 @@ export default function RecentTransactions() {
     <Card className="bg-white shadow-sm border border-gray-200">
       <CardHeader className="flex items-center justify-between pb-6">
         <CardTitle className="text-lg font-semibold text-gray-800">
-          Transações Recentes
+          {t('dashboard.recentTransactions')}
         </CardTitle>
         <div className="flex space-x-2">
           <Button
@@ -180,7 +255,7 @@ export default function RecentTransactions() {
             onClick={() => setFilter("all")}
             className="text-sm"
           >
-            Todas
+            {t('transactions.filters.all')}
           </Button>
           <Button
             variant={filter === "income" ? "default" : "ghost"}
@@ -188,7 +263,7 @@ export default function RecentTransactions() {
             onClick={() => setFilter("income")}
             className="text-sm"
           >
-            Receitas
+            {t('transactions.filters.income')}
           </Button>
           <Button
             variant={filter === "expense" ? "default" : "ghost"}
@@ -196,25 +271,25 @@ export default function RecentTransactions() {
             onClick={() => setFilter("expense")}
             className="text-sm"
           >
-            Despesas
+            {t('transactions.filters.expense')}
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         {filteredTransactions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            Nenhuma transação encontrada
+            {t('dashboard.noTransactions')}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Descrição</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Categoria</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Data</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Valor</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-600">Status</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">{t('transactions.description')}</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">{t('transactions.category')}</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600">{t('transactions.date')}</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600">{t('transactions.amount')}</th>
+                  <th className="text-center py-3 px-4 font-medium text-gray-600">{t('transactions.status.label')}</th>
                 </tr>
               </thead>
               <tbody>

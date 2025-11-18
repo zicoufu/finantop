@@ -1,0 +1,2 @@
+-- Removed the line that tries to add the updated_at column to the users table, 
+-- since it already exists with ON UPDATE CURRENT_TIMESTAMP.

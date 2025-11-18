@@ -1,8 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+.category-indicator {
+  width: 0.75rem; /* w-3 */
+  height: 0.75rem; /* h-3 */
+  border-radius: 9999px; /* rounded-full */
+  background-color: var(--category-bg-color);
+}
 
 :root {
   --background: hsl(0, 0%, 100%);
@@ -41,6 +48,8 @@
   --sidebar-background: hsl(0, 0%, 100%);
   --sidebar-foreground: hsl(240, 5.3%, 26.1%);
   --sidebar-primary: hsl(214, 84%, 56%);
+  --sidebar-width: 16rem;
+  --sidebar-width-icon: 3rem;
   --sidebar-primary-foreground: hsl(0, 0%, 98%);
   --sidebar-accent: hsl(220, 4.8%, 95.9%);
   --sidebar-accent-foreground: hsl(240, 5.9%, 10%);
@@ -84,13 +93,18 @@
   --sidebar-ring: hsl(217.2, 32.6%, 17.5%);
 }
 
+.sidebar-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+}
+
 @layer base {
   * {
     @apply border-border;
   }
-
   body {
-    @apply font-inter antialiased bg-background text-foreground;
+    @apply bg-background text-foreground;
   }
 }
 

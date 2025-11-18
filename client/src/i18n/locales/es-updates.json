@@ -1,0 +1,91 @@
+{
+  "translation": {
+    "expenses": {
+      "title": "Gastos",
+      "newExpense": "Nuevo Gasto",
+      "addExpense": "Agregar Gasto",
+      "editExpense": "Editar Gasto",
+      "totalPaid": "Total Pagado",
+      "pending": "Pendiente",
+      "fixed": "Fijos",
+      "variable": "Variables",
+      "expenseList": "Lista de Gastos",
+      "allExpenses": "Todos los Gastos",
+      "fixedExpenses": "Gastos Fijos",
+      "variableExpenses": "Gastos Variables",
+      "noExpenses": "No se encontraron gastos",
+      "startAddingExpense": "Comience agregando su primer gasto.",
+      "deleteConfirm": "¿Está seguro de que desea eliminar este gasto?",
+      "expenseDeleted": "Gasto eliminado",
+      "expenseDeletedDesc": "El gasto se eliminó con éxito.",
+      "statusUpdated": "Estado actualizado",
+      "statusUpdatedDesc": "El estado del gasto se actualizó con éxito.",
+      "errorLoading": "Error al cargar gastos",
+      "errorDeleting": "No se pudo eliminar el gasto.",
+      "errorUpdating": "No se pudo actualizar el estado del gasto.",
+      "dueDate": "Vence"
+    },
+    "income": {
+      "title": "Ingresos",
+      "newIncome": "Nuevo Ingreso",
+      "addIncome": "Agregar Ingreso",
+      "editIncome": "Editar Ingreso",
+      "totalReceived": "Total Recibido",
+      "pending": "Pendiente",
+      "incomeList": "Lista de Ingresos",
+      "noIncome": "No se encontraron ingresos",
+      "startAddingIncome": "Comience agregando su primer ingreso."
+    },
+    "investments": {
+      "title": "Inversiones",
+      "newInvestment": "Nueva Inversión",
+      "addInvestment": "Agregar Inversión",
+      "editInvestment": "Editar Inversión",
+      "totalInvested": "Total Invertido",
+      "portfolio": "Portafolio",
+      "simulator": "Simulador",
+      "myInvestments": "Mis Inversiones",
+      "noInvestments": "No se encontraron inversiones",
+      "startAddingInvestments": "Comience agregando sus primeras inversiones."
+    },
+    "goals": {
+      "title": "Metas Financieras",
+      "newGoal": "Nueva Meta",
+      "addGoal": "Agregar Meta",
+      "editGoal": "Editar Meta",
+      "totalGoals": "Total de Metas",
+      "totalSaved": "Total Ahorrado",
+      "progress": "Progreso",
+      "saved": "Ahorrado",
+      "target": "Meta",
+      "remaining": "Restante",
+      "addValue": "Agregar Valor",
+      "estimate": "Estimación",
+      "months": "meses",
+      "finalValue": "Valor final"
+    },
+    "alerts": {
+      "title": "Alertas",
+      "unreadAlerts": "Tiene {count} alerta(s) no leída(s)",
+      "unread": "No Leídas",
+      "all": "Todas",
+      "dueDate": "Vencimiento",
+      "new": "Nueva",
+      "expiresToday": "El gasto '{expense}' vence hoy"
+    },
+    "reports": {
+      "title": "Informes",
+      "thisMonth": "Este mes",
+      "export": "Exportar",
+      "overview": "Visión General",
+      "detailed": "Detallado",
+      "income": "Ingresos",
+      "expenses": "Gastos",
+      "balance": "Saldo",
+      "goalsProgress": "Progreso de Metas",
+      "expensesByCategory": "Gastos por Categoría",
+      "incomeVsExpenses": "Ingresos vs Gastos",
+      "months": "meses"
+    }
+  }
+}

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard Finanças Pessoais</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#4F46E5",
+            "background-light": "#F3F4F6", // Gray 100
+            "background-dark": "#111827",  // Gray 900
+            "card-light": "#FFFFFF",
+            "card-dark": "#1F2937", // Gray 800
+            "text-light-primary": "#1F2937", // Gray 800
+            "text-dark-primary": "#F9FAFB", // Gray 50
+            "text-light-secondary": "#6B7280", // Gray 500
+            "text-dark-secondary": "#9CA3AF", // Gray 400
+            "border-light": "#E5E7EB", // Gray 200
+            "border-dark": "#374151", // Gray 700
+          },
+          fontFamily: {
+            display: ["Inter", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.75rem", // 12px
+            lg: "1rem", // 16px
+          },
+        },
+      },
+    };
+  </script>
+<style>::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #4B5563;border-radius: 10px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background-color: #4B5563;}
+    body {
+        -ms-overflow-style: none;scrollbar-width: thin;scrollbar-color: #4B5563 transparent;}
+  </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-text-light-primary dark:text-text-dark-primary">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-80 flex-shrink-0 bg-card-light dark:bg-card-dark p-6 flex flex-col space-y-6 overflow-y-auto">
+<div class="flex items-center space-x-3 p-3 bg-gray-200 dark:bg-gray-700 rounded-lg">
+<div class="p-2 bg-white rounded">
+<span class="material-icons-outlined text-blue-600" style="font-size: 32px;">query_stats</span>
+</div>
+<span class="text-xl font-bold text-text-light-primary dark:text-text-dark-primary">FABRIDATA</span>
+</div>
+<div class="flex-grow flex flex-col space-y-6">
+<div>
+<label class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1" for="conta">Conta</label>
+<select class="w-full bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:ring-primary focus:border-primary" id="conta">
+<option>Todos</option>
+</select>
+</div>
+<div class="p-4 bg-background-light dark:bg-background-dark rounded-lg">
+<div class="flex justify-between items-center text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary mb-3">
+<span>Contas</span>
+<span>Saldo</span>
+</div>
+<ul class="space-y-2 text-sm text-text-light-primary dark:text-text-dark-primary">
+<li class="flex justify-between items-center">
+<span>CAIXADXA</span>
+<div class="flex items-center space-x-2">
+<span>R$ 6.616</span>
+<span class="w-3 h-3 bg-green-500 rounded-full"></span>
+</div>
+</li>
+<li class="flex justify-between items-center">
+<span>BUBANK</span>
+<div class="flex items-center space-x-2">
+<span>-R$ 900</span>
+<span class="w-3 h-3 bg-red-500 rounded-full"></span>
+</div>
+</li>
+<li class="flex justify-between items-center">
+<span>WISA</span>
+<div class="flex items-center space-x-2">
+<span>-R$ 1.500</span>
+<span class="w-3 h-3 bg-red-500 rounded-full"></span>
+</div>
+</li>
+</ul>
+</div>
+<div>
+<label class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1">Período</label>
+<div class="flex space-x-2">
+<div class="relative w-1/2">
+<input class="w-full pl-3 pr-8 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-md text-sm" type="text" value="01/07/2023"/>
+<span class="material-icons-outlined absolute right-2 top-1/2 -translate-y-1/2 text-text-light-secondary dark:text-text-dark-secondary text-base">calendar_today</span>
+</div>
+<div class="relative w-1/2">
+<input class="w-full pl-3 pr-8 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-md text-sm" type="text" value="30/12/2024"/>
+<span class="material-icons-outlined absolute right-2 top-1/2 -translate-y-1/2 text-text-light-secondary dark:text-text-dark-secondary text-base">calendar_today</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1" for="ano">Ano</label>
+<select class="w-full bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:ring-primary focus:border-primary" id="ano">
+<option>2023</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary mb-1" for="mes">Mês</label>
+<select class="w-full bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:ring-primary focus:border-primary" id="mes">
+<option>Todos</option>
+</select>
+</div>
+</div>
+<button class="w-full py-2.5 border border-border-light dark:border-border-dark rounded-lg text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        Limpar filtros
+      </button>
+</aside>
+<main class="flex-1 p-6 overflow-y-auto">
+<header class="mb-6">
+<h1 class="text-3xl font-bold text-text-light-primary dark:text-text-dark-primary">Dashboard Finanças Pessoais</h1>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-lg col-span-1">
+<p class="text-sm opacity-80">Saldo</p>
+<p class="text-4xl font-bold mt-2 mb-4">R$ 4.216</p>
+<img alt="Gráfico de linha do saldo" class="w-full h-12 opacity-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXCxjrarRQjGI_ub7kZMAaxVV5zT_osQuEkYZADx0e7rK_n4qBIG_l2MTU_0yTPZXfx9YN0nZsTiKPms13N5obRdK0AseebUt6Dil3WstkC5eUCfkCKhrOkLBNeOAkTrmCx0GFKMVe__to-0elAte_FsBHAZ5anwWc11TWoq4LXdt_Qx5JcP911X288fAyl2oswW0a-kvsj-Zt2w_vuIr9I6Y3px3NjtdrluA_eHMLrIweNDLd8NQ3c98ecc6EW6S-s8fFpFNC_zQ"/>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg col-span-1">
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Entradas</p>
+<p class="text-4xl font-bold mt-2 mb-4 text-text-light-primary dark:text-text-dark-primary">R$ 20.300</p>
+<img alt="Gráfico de linha das entradas" class="w-full h-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8DQmEPQnoQtDf06UngZNgHxovPDAM71a35MqypeFW_0FWvxXDFZYJWnCVNIh_T95vm5qtR03OAWWF-RABtgq_X1HZf3yjrPhqU7RUxJBy7ZEJtclaNoJOvXb_GbVuufOqhJwwdxeGZ8HILZNadtuO0FBFoQo-635HE1GbCDK7MGA-iv5khqzU6ltYinLKT4tJWsvpCcAp016WrHc9OQtarlmY6Hwj_PucPIdBXPYo5MJwjZO8m8ojBjWxIuPjaEqmLdu5G49g8oQ"/>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg col-span-1">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Despesas</p>
+<p class="text-4xl font-bold mt-2 mb-4 text-text-light-primary dark:text-text-dark-primary">R$ 16.084</p>
+</div>
+<span class="text-xs font-semibold text-text-light-secondary dark:text-text-dark-secondary bg-background-light dark:bg-background-dark px-2 py-1 rounded-full">79,23%</span>
+</div>
+<img alt="Gráfico de linha das despesas" class="w-full h-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUAw8jeJfBo56DyyHrOfMe7xS4wyNr38tueTY5aVOJAYx0qhDXPhGirddfNIv_g_iLmvj3UUYkZAZxYO0KvfxMlelr5zVcMK2szOmJ-13QasY9-h_GuWGLWtjLvhnYeW9sfVizmAW4j4wLA8eXxyCf2vYVT88bY--4ze3R3jpR1-jvQnwU_TvtH-e9gFBGro8_wQkKykZNK8q7bpRUR2sh_S4s4KwECfO5VQYPhs4OaqJqR5epVQyWqRJsHTdsYfm32AdMJ1ogonc"/>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg lg:col-span-2">
+<h2 class="text-lg font-semibold mb-4">Top 5 Entradas por categoria</h2>
+<div class="flex items-end justify-around h-48 space-x-4">
+<div class="flex flex-col items-center flex-1">
+<span class="text-xs text-text-light-secondary dark:text-text-dark-secondary">R$ 15 Mil</span>
+<div class="w-16 bg-cyan-500 h-full rounded-t-md"></div>
+<span class="text-xs mt-2">Salário</span>
+</div>
+<div class="flex flex-col items-center flex-1">
+<span class="text-xs text-text-light-secondary dark:text-text-dark-secondary">R$ 3 Mil</span>
+<div class="w-16 bg-cyan-500 h-1/5 rounded-t-md"></div>
+<span class="text-xs mt-2">Outras Receitas</span>
+</div>
+<div class="flex flex-col items-center flex-1">
+<span class="text-xs text-text-light-secondary dark:text-text-dark-secondary">R$ 3 Mil</span>
+<div class="w-16 bg-cyan-500 h-1/5 rounded-t-md"></div>
+<span class="text-xs mt-2">13º salário</span>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg">
+<h2 class="text-lg font-semibold mb-4">Top 5 Despesas por categoria</h2>
+<div class="flex items-center space-x-6">
+<div class="w-36 h-36">
+<img alt="Gráfico de pizza para categorias de despesa" class="w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcz8JK9wl0WNU0_9_1F8VgUOfv4pi6lEHgtP_1oR5aO5GlRKD87oK3bFqbANIjKwh-zR4ZOtjfXmQdwwbfFTo2d3OpE3ovB_u5yC6UWR8KhHZ0fWMQuh--i7PEc9pC42jDHcjdEPv2J-7NzwonDmQkavFqn9edsT7M-REcELHUmh7-tdRQ9z0Gc8tDowgwGXQM0Oaf_7evT9k3KVm89Po86t5NcGHslYk5xE9qoAdxn1EWP5Vmmmk__7esCWU2ufgnBB9uc83aKqU"/>
+</div>
+<div class="text-xs space-y-2">
+<p class="flex items-center"><span class="w-2.5 h-2.5 bg-red-500 rounded-full mr-2"></span>Supermercado</p>
+<p class="flex items-center"><span class="w-2.5 h-2.5 bg-orange-500 rounded-full mr-2"></span>Cartão de crédito</p>
+<p class="flex items-center"><span class="w-2.5 h-2.5 bg-blue-700 rounded-full mr-2"></span>Plano de saúde</p>
+<p class="flex items-center"><span class="w-2.5 h-2.5 bg-sky-500 rounded-full mr-2"></span>Prestação da casa</p>
+<p class="flex items-center"><span class="w-2.5 h-2.5 bg-teal-400 rounded-full mr-2"></span>Presentes</p>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg lg:col-span-3">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-semibold">Evolução mensal despesas vs entradas</h2>
+<div class="flex items-center space-x-4 text-xs">
+<p class="flex items-center"><span class="w-2.5 h-2.5 bg-red-500 rounded-full mr-2"></span>Despesas</p>
+<p class="flex items-center"><span class="w-2.5 h-2.5 bg-cyan-500 rounded-full mr-2"></span>Entradas</p>
+<p class="flex items-center"><span class="w-2.5 h-2.5 bg-gray-400 dark:bg-gray-600 rounded-full mr-2"></span>Saldo Acumulado</p>
+</div>
+</div>
+<div class="relative h-56">
+<img alt="Gráfico de barras e linha da evolução mensal" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKT6WAPJxnAgp25XF2r6p_4nVYun9Jrq9L5E7F3buQaNt7rremycMSXc5qRdO6wS7vIVFl35tRQijjyUBtf29d1F4Ligk8YlsJiBHy6-HaB46vCPFOlk8Qkaog2qlNN2_AmM6nQtKw1t-AUC5162AeHzCHPRlJC_1StF_T601eKniW5CMV8fwqe3cpJYHV68Y9su21ngo44hPpqwgLimAu11H-Tfc1w3o5jFsri4NLQRu8qfHVf3EGtAXrl1avKEqfN7g81adyZxM"/>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark p-6 rounded-lg lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
+<div class="flex items-center space-x-4">
+<div class="p-3 bg-orange-500/20 rounded-lg">
+<span class="material-icons-outlined text-orange-500">home</span>
+</div>
+<div>
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Moradia</p>
+<p class="text-xl font-bold">R$ 2.929</p>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="p-3 bg-yellow-500/20 rounded-lg">
+<span class="material-icons-outlined text-yellow-500">celebration</span>
+</div>
+<div>
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Lazer</p>
+<p class="text-xl font-bold">R$ 900</p>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="p-3 bg-indigo-500/20 rounded-lg">
+<span class="material-icons-outlined text-indigo-500">credit_card</span>
+</div>
+<div>
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Cartão</p>
+<p class="text-xl font-bold">R$ 1.800</p>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="p-3 bg-teal-500/20 rounded-lg">
+<span class="material-icons-outlined text-teal-500">directions_car</span>
+</div>
+<div>
+<p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Transporte</p>
+<p class="text-xl font-bold">R$ 1.500</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

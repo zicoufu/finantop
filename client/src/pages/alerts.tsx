@@ -5,10 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { queryClient } from "@/lib/queryClient";
-import { apiRequest } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { formatDate } from "@/lib/date";
 import { Bell, CheckCircle, AlertTriangle, Clock, Target, TrendingUp, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface Alert {
   id: number;
@@ -21,32 +22,34 @@ interface Alert {
 }
 
 export default function Alerts() {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const { data: allAlerts, isLoading: allAlertsLoading } = useQuery<Alert[]>({
-    queryKey: ["/api/alerts"],
+    queryKey: ["alerts", "all"],
+    queryFn: () => api("/api/alerts"),
   });
 
   const { data: unreadAlerts, isLoading: unreadAlertsLoading } = useQuery<Alert[]>({
-    queryKey: ["/api/alerts?unread=true"],
+    queryKey: ["alerts", "unread"],
+    queryFn: () => api("/api/alerts?unread=true"),
   });
 
   const markAsReadMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest("PUT", `/api/alerts/${id}/read`, {});
+      return api(`/api/alerts/${id}/read`, { method: 'PUT' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/alerts"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/alerts?unread=true"] });
+      queryClient.invalidateQueries({ queryKey: ["alerts"] });
       toast({
-        title: "Alerta marcado como lido",
-        description: "O alerta foi marcado como lido com sucesso.",
+        title: t('alerts.markAsRead.success.title'),
+        description: t('alerts.markAsRead.success.description'),
       });
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível marcar o alerta como lido.",
+        title: t('common.error'),
+        description: t('alerts.markAsRead.error'),
         variant: "destructive",
       });
     },
@@ -54,20 +57,19 @@ export default function Alerts() {
 
   const deleteAlertMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest("DELETE", `/api/alerts/${id}`);
+      return api(`/api/alerts/${id}`, { method: 'DELETE' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/alerts"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/alerts?unread=true"] });
+      queryClient.invalidateQueries({ queryKey: ["alerts"] });
       toast({
-        title: "Alerta excluído",
-        description: "O alerta foi excluído com sucesso.",
+        title: t('alerts.delete.success.title'),
+        description: t('alerts.delete.success.description'),
       });
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível excluir o alerta.",
+        title: t('common.error'),
+        description: t('alerts.delete.error'),
         variant: "destructive",
       });
     },
@@ -106,15 +108,15 @@ export default function Alerts() {
   const getAlertTypeLabel = (type: string) => {
     switch (type) {
       case 'due_date':
-        return 'Vencimento';
+        return t('alerts.types.dueDate');
       case 'overdue':
-        return 'Vencido';
+        return t('alerts.types.overdue');
       case 'goal_milestone':
-        return 'Meta';
+        return t('alerts.types.goalMilestone');
       case 'investment_maturity':
-        return 'Investimento';
+        return t('alerts.types.investmentMaturity');
       default:
-        return 'Geral';
+        return t('alerts.types.general');
     }
   };
 
@@ -125,7 +127,7 @@ export default function Alerts() {
       <div className="flex flex-col h-full">
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-800">Alertas</h2>
+            <h2 className="text-2xl font-bold text-gray-800">{t('alerts.title')}</h2>
             <Skeleton className="h-6 w-16" />
           </div>
         </header>
@@ -157,7 +159,7 @@ export default function Alerts() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Tem certeza que deseja excluir este alerta?')) {
+    if (confirm(t('alerts.deleteConfirm'))) {
       deleteAlertMutation.mutate(id);
     }
   };
@@ -183,7 +185,7 @@ export default function Alerts() {
                 </Badge>
                 {!alert.isRead && (
                   <Badge className="bg-primary text-white text-xs">
-                    Novo
+                    {t('alerts.badge.new')}
                   </Badge>
                 )}
               </div>
@@ -198,7 +200,7 @@ export default function Alerts() {
                   variant="ghost"
                   size="sm"
                   onClick={() => handleMarkAsRead(alert.id)}
-                  title="Marcar como lido"
+                  title={t('alerts.actions.markAsRead')}
                 >
                   <CheckCircle className="h-4 w-4" />
                 </Button>
@@ -208,7 +210,7 @@ export default function Alerts() {
                 size="sm"
                 onClick={() => handleDelete(alert.id)}
                 className="text-red-600 hover:text-red-700"
-                title="Excluir alerta"
+                title={t('alerts.actions.delete')}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -225,10 +227,10 @@ export default function Alerts() {
       <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Alertas</h2>
+            <h2 className="text-2xl font-bold text-gray-800">{t('alerts.title')}</h2>
             {unreadCount > 0 && (
               <p className="text-sm text-gray-600 mt-1">
-                Você tem {unreadCount} {unreadCount === 1 ? 'alerta não lido' : 'alertas não lidos'}
+                {t('alerts.unreadCount', { count: unreadCount })}
               </p>
             )}
           </div>
@@ -244,14 +246,14 @@ export default function Alerts() {
         <Tabs defaultValue="unread" className="space-y-6">
           <TabsList>
             <TabsTrigger value="unread" className="flex items-center space-x-2">
-              <span>Não Lidos</span>
+              <span>{t('alerts.tabs.unread')}</span>
               {unreadCount > 0 && (
                 <Badge variant="destructive" className="text-xs">
                   {unreadCount}
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="all">Todos</TabsTrigger>
+            <TabsTrigger value="all">{t('alerts.tabs.all')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="unread" className="space-y-4">
@@ -260,10 +262,10 @@ export default function Alerts() {
                 <CardContent className="text-center py-12">
                   <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Tudo em dia!
+                    {t('alerts.empty.unread.title')}
                   </h3>
                   <p className="text-gray-500">
-                    Você não tem alertas não lidos no momento.
+                    {t('alerts.empty.unread.description')}
                   </p>
                 </CardContent>
               </Card>
@@ -282,10 +284,10 @@ export default function Alerts() {
                 <CardContent className="text-center py-12">
                   <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Nenhum alerta
+                    {t('alerts.empty.all.title')}
                   </h3>
                   <p className="text-gray-500">
-                    Você ainda não recebeu nenhum alerta.
+                    {t('alerts.empty.all.description')}
                   </p>
                 </CardContent>
               </Card>

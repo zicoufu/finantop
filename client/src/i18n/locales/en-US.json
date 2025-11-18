@@ -1,0 +1,150 @@
+{
+  "translation": {
+    "app": {
+      "title": "finantop"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "expenses": "Expenses",
+      "income": "Income",
+      "investments": "Investments",
+      "goals": "Goals",
+      "alerts": "Alerts",
+      "reports": "Reports",
+      "preferences": "Preferences"
+    },
+    "categories": {
+      "housing": "Housing",
+      "food": "Food",
+      "transportation": "Transportation",
+      "healthWellness": "Health & Wellness",
+      "education": "Education",
+      "entertainment": "Entertainment",
+      "clothing": "Clothing",
+      "homeServices": "Home Services",
+      "pets": "Pets",
+      "financial": "Financial Expenses",
+      "taxes": "Taxes & Fees",
+      "other": "Other Expenses",
+      "uncategorized": "Uncategorized"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "summary": "Summary",
+      "expensesByCategory": "Expenses by Category",
+      "balanceEvolution": "Balance Evolution",
+      "noData": {
+        "title": "No Data Available",
+        "description": "Start by adding your first transaction"
+      },
+      "noDataToDisplay": "No data to display",
+      "errorLoading": "Error loading dashboard data",
+      "charts": {
+        "errorLoading": "Error loading chart data"
+      },
+      "expensesChart": {
+        "title": "Expenses by Category"
+      },
+      "balanceChart": {
+        "title": "Balance Evolution"
+      },
+      "upcomingBills": "Upcoming Bills",
+      "upcomingBillsObj": {
+        "title": "Upcoming Bills",
+        "viewAll": "View All",
+        "empty": "No upcoming bills"
+      },
+      "goals": "Goals",
+      "goalsObj": {
+        "title": "Goals",
+        "empty": "No goals defined",
+        "create": "Create Goal"
+      },
+      "recentTransactions": "Recent Transactions",
+      "transactions": {
+        "title": "Transactions",
+        "all": "All",
+        "incomes": "Incomes",
+        "expenses": "Expenses",
+        "description": "Description",
+        "category": "Category",
+        "date": "Date",
+        "amount": "Amount",
+        "status": {
+          "label": "Status",
+          "received": "Received",
+          "paid": "Paid",
+          "pending": "Pending",
+          "overdue": "Overdue"
+        },
+        "filters": {
+          "all": "All",
+          "income": "Income",
+          "expense": "Expenses"
+        }
+      },
+      "recentTransactionsObj": {
+        "title": "Recent Transactions",
+        "all": "All",
+        "income": "Income", 
+        "expenses": "Expenses",
+        "empty": "No transactions"
+      },
+      "todas": "All",
+      "receitas": "Income",
+      "despesas": "Expenses"
+    },
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "loading": "Loading...",
+      "search": "Search",
+      "noDataToDisplay": "No data to display",
+      "viewAll": "View All",
+      "create": "Create",
+      "currentMonth": "Current Month",
+      "newTransaction": "New Transaction",
+      "mesAtual": "Current Month",
+      "novaTransacao": "New Transaction"
+    },
+    "expenses": {
+      "title": "Expenses",
+      "totalPaid": "Total Paid",
+      "newExpense": "Add Expense",
+      "addExpense": "Add Expense",
+      "pending": "Pending",
+      "fixed": "Fixed",
+      "variable": "Variable",
+      "filters": {
+        "all": "All",
+        "fixed": "Fixed",
+        "variable": "Variable"
+      },
+      "filter": {
+        "all": "All",
+        "fixed": "Fixed",
+        "variable": "Variable"
+      },
+      "actions": {
+        "add": "Add Expense"
+      },
+      "noExpenses": "No expenses found"
+    },
+    "auth": {
+      "continueWithGoogle": "Continue with Google"
+    },
+    "login": {
+      "description": "Enter your credentials to access your account",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "submit": "Login",
+      "loggingIn": "Logging in...",
+      "success": "Login successful!",
+      "noAccount": "Don't have an account?",
+      "register": "Register"
+    }
+  }
+}

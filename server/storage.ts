@@ -1,583 +1,620 @@
 import { 
-  users, categories, transactions, goals, investments, alerts,
+  users, categories, transactions, goals, investments, alerts, userPreferences,
   type User, type InsertUser,
   type Category, type InsertCategory,
   type Transaction, type InsertTransaction,
   type Goal, type InsertGoal,
   type Investment, type InsertInvestment,
-  type Alert, type InsertAlert
-} from "@shared/schema";
-import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+  type Alert, type InsertAlert,
+  type UserPreference, type InsertUserPreference,
+} from "../shared/schema.js";
+import { db } from "./db.js";
+import { eq, and, desc, asc, gte, lte } from "drizzle-orm";
+import { type MySqlTransaction } from 'drizzle-orm/mysql-core';
+import bcrypt from 'bcrypt';
 
-export interface IStorage {
-  // Users
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+// Tipagem para o cliente de transação do Drizzle
+type TransactionClient = MySqlTransaction<any, any, any, any>;
 
-  // Categories
+// Renomeando a interface para evitar conflito com a interface Storage do DOM
+export interface IAppStorage {
+  runInTransaction<T>(callback: (tx: TransactionClient) => Promise<T>): Promise<T>;
+  getUsers(): Promise<User[]>;
+  getUser(id: number): Promise<User | null>;
+  getUserByEmail(email: string): Promise<User | null>;
+  createUser(user: InsertUser, tx?: TransactionClient): Promise<User>;
   getCategories(userId: number): Promise<Category[]>;
-  getCategoriesByType(userId: number, type: string): Promise<Category[]>;
+  getDefaultCategories(): Promise<Category[]>;
+  createManyCategories(categories: InsertCategory[], tx?: TransactionClient): Promise<void>;
   createCategory(category: InsertCategory): Promise<Category>;
   updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category | undefined>;
   deleteCategory(id: number): Promise<boolean>;
-
-  // Transactions
   getTransactions(userId: number): Promise<Transaction[]>;
-  getTransactionsByDateRange(userId: number, startDate: string, endDate: string): Promise<Transaction[]>;
+  getTransactionsByDateRange(userId: number, startDate: Date, endDate: Date): Promise<Transaction[]>;
   getTransactionsByType(userId: number, type: string): Promise<Transaction[]>;
   getUpcomingTransactions(userId: number, days: number): Promise<Transaction[]>;
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
   updateTransaction(id: number, transaction: Partial<InsertTransaction>): Promise<Transaction | undefined>;
   deleteTransaction(id: number): Promise<boolean>;
-
-  // Goals
+  getTransactionById(id: number): Promise<Transaction | undefined>;
   getGoals(userId: number): Promise<Goal[]>;
   createGoal(goal: InsertGoal): Promise<Goal>;
   updateGoal(id: number, goal: Partial<InsertGoal>): Promise<Goal | undefined>;
   deleteGoal(id: number): Promise<boolean>;
-
-  // Investments
   getInvestments(userId: number): Promise<Investment[]>;
   createInvestment(investment: InsertInvestment): Promise<Investment>;
   updateInvestment(id: number, investment: Partial<InsertInvestment>): Promise<Investment | undefined>;
   deleteInvestment(id: number): Promise<boolean>;
-
-  // Alerts
   getAlerts(userId: number): Promise<Alert[]>;
   getUnreadAlerts(userId: number): Promise<Alert[]>;
   createAlert(alert: InsertAlert): Promise<Alert>;
   markAlertAsRead(id: number): Promise<boolean>;
   deleteAlert(id: number): Promise<boolean>;
+  getUserPreferences(userId: number): Promise<UserPreference | undefined>;
+  createUserPreferences(preferences: Omit<InsertUserPreference, 'id' | 'createdAt' | 'updatedAt'>, tx?: TransactionClient): Promise<UserPreference>;
+  createOrUpdateUserPreferences(userId: number, preferences: Partial<InsertUserPreference>): Promise<UserPreference>;
+  getCategoriesByType(userId: number, type: string): Promise<Category[]>;
+  initializeSampleData(): Promise<{ success: boolean; userId?: number; message?: string }>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private categories: Map<number, Category>;
-  private transactions: Map<number, Transaction>;
-  private goals: Map<number, Goal>;
-  private investments: Map<number, Investment>;
-  private alerts: Map<number, Alert>;
-  private currentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.categories = new Map();
-    this.transactions = new Map();
-    this.goals = new Map();
-    this.investments = new Map();
-    this.alerts = new Map();
-    this.currentId = 1;
-
-    // Initialize with demo user and default categories
-    this.initializeDefaultData();
+class DatabaseStorage implements IAppStorage {
+  async runInTransaction<T>(callback: (tx: TransactionClient) => Promise<T>): Promise<T> {
+    return db.transaction(callback);
   }
 
-  private initializeDefaultData() {
-    // Create demo user
-    const demoUser: User = {
-      id: 1,
-      username: "demo",
-      password: "demo123",
-      name: "João Silva",
-      email: "joao@example.com",
-      createdAt: new Date()
-    };
-    this.users.set(1, demoUser);
-
-    // Default expense categories
-    const defaultExpenseCategories: Category[] = [
-      { id: 2, name: "Alimentação", type: "expense", color: "#ef4444", icon: "fas fa-utensils", userId: 1 },
-      { id: 3, name: "Transporte", type: "expense", color: "#3b82f6", icon: "fas fa-car", userId: 1 },
-      { id: 4, name: "Moradia", type: "expense", color: "#10b981", icon: "fas fa-home", userId: 1 },
-      { id: 5, name: "Lazer", type: "expense", color: "#f59e0b", icon: "fas fa-gamepad", userId: 1 },
-      { id: 6, name: "Saúde", type: "expense", color: "#8b5cf6", icon: "fas fa-heart", userId: 1 },
-      { id: 7, name: "Educação", type: "expense", color: "#6366f1", icon: "fas fa-book", userId: 1 },
-      { id: 8, name: "Outros", type: "expense", color: "#6b7280", icon: "fas fa-ellipsis-h", userId: 1 },
-    ];
-
-    // Default income categories
-    const defaultIncomeCategories: Category[] = [
-      { id: 9, name: "Salário", type: "income", color: "#059669", icon: "fas fa-briefcase", userId: 1 },
-      { id: 10, name: "Freelance", type: "income", color: "#0891b2", icon: "fas fa-laptop", userId: 1 },
-      { id: 11, name: "Investimentos", type: "income", color: "#7c3aed", icon: "fas fa-chart-line", userId: 1 },
-      { id: 12, name: "Outros", type: "income", color: "#6b7280", icon: "fas fa-coins", userId: 1 },
-    ];
-
-    [...defaultExpenseCategories, ...defaultIncomeCategories].forEach(cat => {
-      this.categories.set(cat.id, cat);
-    });
-
-    // Add sample transactions with expense types
-    const sampleTransactions: Transaction[] = [
-      // Fixed expenses
-      {
-        id: 13,
-        description: "Aluguel",
-        amount: "1200.00",
-        date: "2025-06-01",
-        type: "expense",
-        categoryId: 4, // Moradia
-        status: "paid",
-        isRecurring: true,
-        expenseType: "fixed",
-        dueDate: null,
-        userId: 1,
-        createdAt: new Date()
-      },
-      {
-        id: 14,
-        description: "Conta de Internet",
-        amount: "89.90",
-        date: "2025-06-05",
-        type: "expense",
-        categoryId: 8, // Outros
-        status: "paid",
-        isRecurring: true,
-        expenseType: "fixed",
-        dueDate: null,
-        userId: 1,
-        createdAt: new Date()
-      },
-      {
-        id: 15,
-        description: "Seguro do Carro",
-        amount: "350.00",
-        date: "2025-06-10",
-        type: "expense",
-        categoryId: 3, // Transporte
-        status: "pending",
-        isRecurring: true,
-        expenseType: "fixed",
-        dueDate: "2025-06-15",
-        userId: 1,
-        createdAt: new Date()
-      },
-      // Variable expenses
-      {
-        id: 16,
-        description: "Supermercado",
-        amount: "250.75",
-        date: "2025-06-08",
-        type: "expense",
-        categoryId: 2, // Alimentação
-        status: "paid",
-        isRecurring: false,
-        expenseType: "variable",
-        dueDate: null,
-        userId: 1,
-        createdAt: new Date()
-      },
-      {
-        id: 17,
-        description: "Cinema",
-        amount: "35.00",
-        date: "2025-06-11",
-        type: "expense",
-        categoryId: 5, // Lazer
-        status: "paid",
-        isRecurring: false,
-        expenseType: "variable",
-        dueDate: null,
-        userId: 1,
-        createdAt: new Date()
-      },
-      {
-        id: 18,
-        description: "Combustível",
-        amount: "120.00",
-        date: "2025-06-12",
-        type: "expense",
-        categoryId: 3, // Transporte
-        status: "paid",
-        isRecurring: false,
-        expenseType: "variable",
-        dueDate: null,
-        userId: 1,
-        createdAt: new Date()
-      }
-    ];
-
-    sampleTransactions.forEach(transaction => {
-      this.transactions.set(transaction.id, transaction);
-    });
-
-    this.currentId = 19;
+  async getUsers(): Promise<User[]> {
+    return db.select().from(users).orderBy(desc(users.id));
   }
 
-  // Users
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+  async getUser(id: number): Promise<User | null> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user ?? null;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+  async getUserByEmail(email: string): Promise<User | null> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user ?? null;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = { 
-      ...insertUser, 
-      id, 
-      createdAt: new Date() 
-    };
-    this.users.set(id, user);
-    return user;
+  async createUser(data: InsertUser, tx?: TransactionClient): Promise<User> {
+    const dbClient = tx || db;
+    const result = await dbClient.insert(users).values(data);
+    const newUserId = result[0].insertId;
+    const [newUser] = await dbClient.select().from(users).where(eq(users.id, newUserId));
+    if (!newUser) {
+      throw new Error("Failed to retrieve new user after creation.");
+    }
+    return newUser;
   }
 
-  // Categories
   async getCategories(userId: number): Promise<Category[]> {
-    return Array.from(this.categories.values()).filter(cat => cat.userId === userId);
+    return db.select().from(categories).where(eq(categories.userId, userId));
   }
 
   async getCategoriesByType(userId: number, type: string): Promise<Category[]> {
-    return Array.from(this.categories.values()).filter(cat => cat.userId === userId && cat.type === type);
+    return db.select()
+      .from(categories)
+      .where(and(
+        eq(categories.userId, userId),
+        eq(categories.type, type)
+      ));
+  }
+
+  async getDefaultCategories(): Promise<Category[]> {
+    const DEMO_USER_ID = 1;
+    const existing = await db.select().from(categories).where(eq(categories.userId, DEMO_USER_ID));
+
+    // Fallback em memória com um conjunto mínimo garantido (inclui pelo menos 1 de renda e diversas de despesa)
+    const now = new Date();
+    const fallback: Category[] = [
+      // Rendas
+      { id: 0, userId: DEMO_USER_ID, name: 'Salário', type: 'income', icon: 'cash', color: '#2ecc71', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Horas Extras', type: 'income', icon: 'overtime', color: '#27ae60', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Comissões', type: 'income', icon: 'commission', color: '#229954', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Freelance/Profissional Liberal', type: 'income', icon: 'freelance', color: '#1e8449', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Bônus e PLR', type: 'income', icon: 'bonus', color: '#2ecc71', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Juros', type: 'income', icon: 'interest', color: '#16a085', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Dividendos', type: 'income', icon: 'dividends', color: '#138d75', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Aluguéis', type: 'income', icon: 'rent', color: '#0e6655', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Royalties', type: 'income', icon: 'royalties', color: '#117864', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Ganhos de Capital', type: 'income', icon: 'capital-gains', color: '#1abc9c', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Lucro Empresarial', type: 'income', icon: 'business-profit', color: '#20c997', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Sócios e Participações', type: 'income', icon: 'partnerships', color: '#28a745', createdAt: now, updatedAt: now },
+      // Despesas (usando nomes compatíveis com traduções)
+      { id: 0, userId: DEMO_USER_ID, name: 'Moradia e Habitação', type: 'expense', icon: 'home', color: '#e74c3c', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Alimentação', type: 'expense', icon: 'food', color: '#f1c40f', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Transporte', type: 'expense', icon: 'car', color: '#3498db', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Saúde e Bem-estar', type: 'expense', icon: 'heart', color: '#9b59b6', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Educação', type: 'expense', icon: 'book', color: '#1abc9c', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Entretenimento', type: 'expense', icon: 'gamepad', color: '#e67e22', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Vestuário e Cuidados Pessoais', type: 'expense', icon: 'tshirt', color: '#34495e', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Serviços Domésticos', type: 'expense', icon: 'tools', color: '#7f8c8d', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Animais de Estimação', type: 'expense', icon: 'paw', color: '#8e44ad', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Despesas Financeiras', type: 'expense', icon: 'wallet', color: '#c0392b', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Impostos e Taxas', type: 'expense', icon: 'percent', color: '#d35400', createdAt: now, updatedAt: now },
+      { id: 0, userId: DEMO_USER_ID, name: 'Outras Despesas', type: 'expense', icon: 'dots', color: '#95a5a6', createdAt: now, updatedAt: now },
+    ];
+    // Se já existirem categorias no usuário DEMO, garantimos que exista ao menos 1 de renda e 1 de despesa.
+    if (existing && existing.length > 0) {
+      const hasIncome = existing.some((c) => c.type === 'income');
+      const hasExpense = existing.some((c) => c.type === 'expense');
+      if (hasIncome && hasExpense) {
+        return existing;
+      }
+      // Complementa com o que estiver faltando a partir do fallback em memória
+      const additions = fallback.filter((c) => (c.type === 'income' && !hasIncome) || (c.type === 'expense' && !hasExpense));
+      return [...existing, ...additions];
+    }
+
+    // Caso não haja nada no usuário DEMO, retorna o fallback completo
+    return fallback;
+  }
+
+  async createManyCategories(data: InsertCategory[], tx?: TransactionClient): Promise<void> {
+    const dbClient = tx || db;
+    if (data.length === 0) return;
+    await dbClient.insert(categories).values(data);
   }
 
   async createCategory(category: InsertCategory): Promise<Category> {
-    const id = this.currentId++;
-    const newCategory: Category = { ...category, id };
-    this.categories.set(id, newCategory);
+    if (!category.userId) {
+      throw new Error('UserID é obrigatório para criar uma categoria.');
+    }
+    const result = await db.insert(categories).values(category);
+    const [newCategory] = await db.select().from(categories).where(eq(categories.id, result[0].insertId));
+    if (!newCategory) throw new Error('Failed to create category');
     return newCategory;
   }
 
   async updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category | undefined> {
-    const existing = this.categories.get(id);
-    if (!existing) return undefined;
-    
-    const updated = { ...existing, ...category };
-    this.categories.set(id, updated);
+    await db.update(categories).set(category).where(eq(categories.id, id));
+    const [updated] = await db.select().from(categories).where(eq(categories.id, id));
     return updated;
   }
 
   async deleteCategory(id: number): Promise<boolean> {
-    return this.categories.delete(id);
+    await db.delete(categories).where(eq(categories.id, id));
+    return true;
   }
 
-  // Transactions
   async getTransactions(userId: number): Promise<Transaction[]> {
-    return Array.from(this.transactions.values()).filter(t => t.userId === userId);
+    return db.select().from(transactions).where(eq(transactions.userId, userId)).orderBy(desc(transactions.date));
   }
 
-  async getTransactionsByDateRange(userId: number, startDate: string, endDate: string): Promise<Transaction[]> {
-    return Array.from(this.transactions.values()).filter(t => 
-      t.userId === userId && 
-      t.date >= startDate && 
-      t.date <= endDate
-    );
+  async getTransactionsByDateRange(userId: number, startDate: Date, endDate: Date): Promise<Transaction[]> {
+    return db.select()
+      .from(transactions)
+      .where(and(
+        eq(transactions.userId, userId),
+        gte(transactions.date, startDate),
+        lte(transactions.date, endDate)
+      ))
+      .orderBy(asc(transactions.date));
   }
 
   async getTransactionsByType(userId: number, type: string): Promise<Transaction[]> {
-    return Array.from(this.transactions.values()).filter(t => t.userId === userId && t.type === type);
+    return db.select()
+      .from(transactions)
+      .where(and(
+        eq(transactions.userId, userId),
+        eq(transactions.type, type)
+      ))
+      .orderBy(desc(transactions.date));
   }
 
   async getUpcomingTransactions(userId: number, days: number): Promise<Transaction[]> {
     const today = new Date();
-    const futureDate = new Date(today.getTime() + days * 24 * 60 * 60 * 1000);
-    const todayStr = today.toISOString().split('T')[0];
-    const futureDateStr = futureDate.toISOString().split('T')[0];
-
-    return Array.from(this.transactions.values()).filter(t => 
-      t.userId === userId && 
-      t.dueDate && 
-      t.dueDate >= todayStr && 
-      t.dueDate <= futureDateStr &&
-      t.status === 'pending'
-    );
+    today.setHours(0, 0, 0, 0);
+    
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + days);
+    futureDate.setHours(23, 59, 59, 999);
+    
+    return db.select()
+      .from(transactions)
+      .where(and(
+        eq(transactions.userId, userId),
+        gte(transactions.date, today),
+        lte(transactions.date, futureDate)
+      ))
+      .orderBy(asc(transactions.date));
   }
 
   async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
-    const id = this.currentId++;
-    const newTransaction: Transaction = { 
-      ...transaction, 
-      id, 
-      createdAt: new Date(),
-      isRecurring: transaction.isRecurring || false,
-      dueDate: transaction.dueDate || null,
-      expenseType: transaction.expenseType || null
+    // Garantir datas corretas e timestamps exigidos pelo banco
+    const normalizeAmount = (value: any): string => {
+      if (value === null || value === undefined) return '0.00';
+      if (typeof value === 'number') return value.toFixed(2);
+      if (typeof value === 'string') {
+        const withDot = value.replace(',', '.').trim();
+        const num = Number(withDot);
+        if (Number.isNaN(num)) {
+          throw new Error(`Invalid amount value: ${value}`);
+        }
+        return num.toFixed(2);
+      }
+      throw new Error(`Unsupported amount type: ${typeof value}`);
     };
-    this.transactions.set(id, newTransaction);
+
+    const transactionWithTimestamps: InsertTransaction & { createdAt: Date; updatedAt: Date; amount: string } = {
+      ...transaction,
+      amount: normalizeAmount((transaction as any).amount),
+      date: typeof transaction.date === 'string' ? new Date(transaction.date) : transaction.date,
+      dueDate: transaction.dueDate ? (typeof transaction.dueDate === 'string' ? new Date(transaction.dueDate) : transaction.dueDate) : null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any;
+
+    // console.debug('[storage.createTransaction] Insert values:', transactionWithTimestamps);
+
+    const result = await db.insert(transactions).values(transactionWithTimestamps);
+    const [newTransaction] = await db.select().from(transactions).where(eq(transactions.id, result[0].insertId));
+    if (!newTransaction) throw new Error('Failed to create transaction');
+    await this.createAlertIfNeeded(newTransaction);
     return newTransaction;
   }
 
   async updateTransaction(id: number, transaction: Partial<InsertTransaction>): Promise<Transaction | undefined> {
-    const existing = this.transactions.get(id);
-    if (!existing) return undefined;
-    
-    const updated = { ...existing, ...transaction };
-    this.transactions.set(id, updated);
+    // Normalizar datas quando presentes e atualizar updatedAt
+    const normalizeAmount = (value: any): string | undefined => {
+      if (value === undefined) return undefined;
+      if (value === null) return '0.00';
+      if (typeof value === 'number') return value.toFixed(2);
+      if (typeof value === 'string') {
+        const withDot = value.replace(',', '.').trim();
+        const num = Number(withDot);
+        if (Number.isNaN(num)) {
+          throw new Error(`Invalid amount value: ${value}`);
+        }
+        return num.toFixed(2);
+      }
+      throw new Error(`Unsupported amount type: ${typeof value}`);
+    };
+
+    const transactionWithTimestamp: Partial<InsertTransaction> & { updatedAt: Date; amount?: string } = {
+      ...transaction,
+      amount: normalizeAmount((transaction as any).amount),
+      date: transaction.date ? (typeof transaction.date === 'string' ? new Date(transaction.date) : transaction.date) : undefined,
+      dueDate: transaction.dueDate === null
+        ? null
+        : (transaction.dueDate ? (typeof transaction.dueDate === 'string' ? new Date(transaction.dueDate) : transaction.dueDate) : undefined),
+      updatedAt: new Date(),
+    } as any;
+
+    // Remover chaves com valor undefined para não sobrescrever indevidamente
+    Object.keys(transactionWithTimestamp).forEach((key) => ((transactionWithTimestamp as any)[key] === undefined) && delete (transactionWithTimestamp as any)[key]);
+
+    await db.update(transactions).set(transactionWithTimestamp).where(eq(transactions.id, id));
+    const [updated] = await db.select().from(transactions).where(eq(transactions.id, id));
+    if (updated) {
+      await this.createAlertIfNeeded(updated);
+    }
     return updated;
   }
 
   async deleteTransaction(id: number): Promise<boolean> {
-    return this.transactions.delete(id);
+    await db.delete(transactions).where(eq(transactions.id, id));
+    return true;
   }
 
-  // Goals
+  async getTransactionById(id: number): Promise<Transaction | undefined> {
+    const [transaction] = await db.select().from(transactions).where(eq(transactions.id, id));
+    return transaction;
+  }
+
   async getGoals(userId: number): Promise<Goal[]> {
-    return Array.from(this.goals.values()).filter(g => g.userId === userId);
+    return db.select().from(goals).where(eq(goals.userId, userId));
   }
 
   async createGoal(goal: InsertGoal): Promise<Goal> {
-    const id = this.currentId++;
-    const newGoal: Goal = { 
-      ...goal, 
-      id, 
-      createdAt: new Date() 
+    // Normalizar valores e garantir timestamps obrigatórios
+    const normalizeAmount = (value: any): string => {
+      if (value === null || value === undefined) return '0.00';
+      if (typeof value === 'number') return value.toFixed(2);
+      if (typeof value === 'string') {
+        const withDot = value.replace(',', '.').trim();
+        const num = Number(withDot);
+        if (Number.isNaN(num)) {
+          throw new Error(`Invalid amount value: ${value}`);
+        }
+        return num.toFixed(2);
+      }
+      throw new Error(`Unsupported amount type: ${typeof value}`);
     };
-    this.goals.set(id, newGoal);
+
+    const goalWithTimestamps: InsertGoal & { createdAt: Date; updatedAt: Date; targetAmount?: any; currentAmount?: any; monthlyContribution?: any; annualInterestRate?: any } = {
+      ...goal,
+      // Datas
+      targetDate: (goal as any).targetDate ? (typeof (goal as any).targetDate === 'string' ? new Date((goal as any).targetDate) : (goal as any).targetDate) : null,
+      // Números/valores monetários
+      targetAmount: (goal as any).targetAmount !== undefined ? normalizeAmount((goal as any).targetAmount) : (goal as any).targetAmount,
+      currentAmount: (goal as any).currentAmount !== undefined ? normalizeAmount((goal as any).currentAmount) : (goal as any).currentAmount,
+      monthlyContribution: (goal as any).monthlyContribution !== undefined ? normalizeAmount((goal as any).monthlyContribution) : (goal as any).monthlyContribution,
+      // Taxa anual pode ser decimal; manter como string normalizada com ponto
+      annualInterestRate: (goal as any).annualInterestRate !== undefined
+        ? (typeof (goal as any).annualInterestRate === 'number'
+            ? (goal as any).annualInterestRate.toString()
+            : (goal as any).annualInterestRate?.toString().replace(',', '.'))
+        : (goal as any).annualInterestRate,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any;
+
+    const result = await db.insert(goals).values(goalWithTimestamps);
+    const [newGoal] = await db.select().from(goals).where(eq(goals.id, result[0].insertId));
+    if (!newGoal) throw new Error('Failed to create goal');
     return newGoal;
   }
 
   async updateGoal(id: number, goal: Partial<InsertGoal>): Promise<Goal | undefined> {
-    const existing = this.goals.get(id);
-    if (!existing) return undefined;
-    
-    const updated = { ...existing, ...goal };
-    this.goals.set(id, updated);
+    const normalizeAmount = (value: any): string | undefined => {
+      if (value === undefined) return undefined;
+      if (value === null) return '0.00';
+      if (typeof value === 'number') return value.toFixed(2);
+      if (typeof value === 'string') {
+        const withDot = value.replace(',', '.').trim();
+        const num = Number(withDot);
+        if (Number.isNaN(num)) {
+          throw new Error(`Invalid amount value: ${value}`);
+        }
+        return num.toFixed(2);
+      }
+      throw new Error(`Unsupported amount type: ${typeof value}`);
+    };
+
+    const goalWithTimestamp: Partial<InsertGoal> & { updatedAt: Date } = {
+      ...goal,
+      targetDate: (goal as any).targetDate === null
+        ? null
+        : ((goal as any).targetDate
+            ? (typeof (goal as any).targetDate === 'string' ? new Date((goal as any).targetDate) : (goal as any).targetDate)
+            : undefined),
+      targetAmount: normalizeAmount((goal as any).targetAmount),
+      currentAmount: normalizeAmount((goal as any).currentAmount),
+      monthlyContribution: normalizeAmount((goal as any).monthlyContribution),
+      annualInterestRate: (goal as any).annualInterestRate !== undefined
+        ? (typeof (goal as any).annualInterestRate === 'number'
+            ? (goal as any).annualInterestRate.toString()
+            : (goal as any).annualInterestRate?.toString().replace(',', '.'))
+        : undefined,
+      updatedAt: new Date(),
+    } as any;
+
+    // Remover undefined para não sobrescrever indevido
+    Object.keys(goalWithTimestamp).forEach((key) => ((goalWithTimestamp as any)[key] === undefined) && delete (goalWithTimestamp as any)[key]);
+
+    await db.update(goals).set(goalWithTimestamp).where(eq(goals.id, id));
+    const [updated] = await db.select().from(goals).where(eq(goals.id, id));
     return updated;
   }
 
   async deleteGoal(id: number): Promise<boolean> {
-    return this.goals.delete(id);
+    await db.delete(goals).where(eq(goals.id, id));
+    return true;
   }
 
-  // Investments
   async getInvestments(userId: number): Promise<Investment[]> {
-    return Array.from(this.investments.values()).filter(i => i.userId === userId);
+    return db.select()
+      .from(investments)
+      .where(eq(investments.userId, userId))
+      .orderBy(desc(investments.createdAt));
   }
 
   async createInvestment(investment: InsertInvestment): Promise<Investment> {
-    const id = this.currentId++;
-    const newInvestment: Investment = { 
-      ...investment, 
-      id, 
-      createdAt: new Date() 
-    };
-    this.investments.set(id, newInvestment);
+    const result = await db.insert(investments).values(investment);
+    const [newInvestment] = await db.select()
+      .from(investments)
+      .where(eq(investments.id, result[0].insertId));
+    
+    if (!newInvestment) throw new Error('Failed to create investment');
     return newInvestment;
   }
 
   async updateInvestment(id: number, investment: Partial<InsertInvestment>): Promise<Investment | undefined> {
-    const existing = this.investments.get(id);
-    if (!existing) return undefined;
+    await db.update(investments)
+      .set(investment)
+      .where(eq(investments.id, id));
     
-    const updated = { ...existing, ...investment };
-    this.investments.set(id, updated);
+    const [updated] = await db.select()
+      .from(investments)
+      .where(eq(investments.id, id));
+    
     return updated;
   }
 
   async deleteInvestment(id: number): Promise<boolean> {
-    return this.investments.delete(id);
+    await db.delete(investments).where(eq(investments.id, id));
+    return true;
   }
 
-  // Alerts
   async getAlerts(userId: number): Promise<Alert[]> {
-    return Array.from(this.alerts.values()).filter(a => a.userId === userId);
+    return db.select().from(alerts).where(eq(alerts.userId, userId)).orderBy(desc(alerts.createdAt));
   }
 
   async getUnreadAlerts(userId: number): Promise<Alert[]> {
-    return Array.from(this.alerts.values()).filter(a => a.userId === userId && !a.isRead);
+    return db.select()
+      .from(alerts)
+      .where(and(
+        eq(alerts.userId, userId),
+        eq(alerts.isRead, false)
+      ))
+      .orderBy(desc(alerts.createdAt));
   }
 
   async createAlert(alert: InsertAlert): Promise<Alert> {
-    const id = this.currentId++;
-    const newAlert: Alert = { 
-      ...alert, 
-      id, 
-      createdAt: new Date() 
-    };
-    this.alerts.set(id, newAlert);
+    const alertWithTimestamps = {
+      ...alert,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any;
+    // console.debug('[storage.createAlert] Insert values:', alertWithTimestamps);
+    const result = await db.insert(alerts).values(alertWithTimestamps);
+    const [newAlert] = await db.select().from(alerts).where(eq(alerts.id, result[0].insertId));
+    if (!newAlert) throw new Error('Failed to create alert');
     return newAlert;
   }
 
   async markAlertAsRead(id: number): Promise<boolean> {
-    const alert = this.alerts.get(id);
-    if (!alert) return false;
-    
-    alert.isRead = true;
-    this.alerts.set(id, alert);
+    await db.update(alerts)
+      .set({ isRead: true })
+      .where(eq(alerts.id, id));
     return true;
   }
 
   async deleteAlert(id: number): Promise<boolean> {
-    return this.alerts.delete(id);
+    await db.delete(alerts).where(eq(alerts.id, id));
+    return true;
+  }
+
+  async getUserPreferences(userId: number): Promise<UserPreference | undefined> {
+    const [preference] = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId));
+    return preference;
+  }
+
+  async createUserPreferences(preferences: Omit<InsertUserPreference, 'id' | 'createdAt' | 'updatedAt'>, tx?: TransactionClient): Promise<UserPreference> {
+    const dbClient = tx || db;
+    const now = new Date();
+    const result = await dbClient.insert(userPreferences).values({
+      ...preferences,
+      createdAt: now,
+      updatedAt: now
+    });
+    const [newUserPreference] = await dbClient.select().from(userPreferences).where(eq(userPreferences.id, result[0].insertId));
+    if (!newUserPreference) throw new Error("Failed to retrieve new user preference after creation.");
+    return newUserPreference;
+  }
+
+  async createOrUpdateUserPreferences(userId: number, preferences: Partial<InsertUserPreference>): Promise<UserPreference> {
+    // Verificar se já existem preferências para este usuário
+    const existingPreferences = await this.getUserPreferences(userId);
+    
+    if (existingPreferences) {
+      // Atualizar preferências existentes
+      await db.update(userPreferences)
+        .set(preferences)
+        .where(eq(userPreferences.id, existingPreferences.id));
+      
+      const [updated] = await db.select()
+        .from(userPreferences)
+        .where(eq(userPreferences.id, existingPreferences.id));
+      
+      if (!updated) throw new Error("Failed to update user preferences");
+      return updated;
+    } else {
+      // Criar novas preferências
+      const newPreferences = {
+        userId,
+        ...preferences
+      } as InsertUserPreference;
+      
+      return this.createUserPreferences(newPreferences);
+    }
+  }
+
+  private async createAlertIfNeeded(transaction: Transaction): Promise<void> {
+    if (transaction.type === 'expense' && transaction.dueDate) {
+      const dueDate = new Date(transaction.dueDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize today to the start of the day
+      const dayDiff = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+
+      if (dayDiff <= 7) { 
+        let alertMessage = `A despesa "${transaction.description}" vence em ${dayDiff} dia(s).`;
+        if (dayDiff < 0) {
+          alertMessage = `A despesa "${transaction.description}" venceu há ${Math.abs(dayDiff)} dia(s).`;
+        } else if (dayDiff === 0) {
+          alertMessage = `A despesa "${transaction.description}" vence hoje.`;
+        }
+        
+        const alertData: InsertAlert = {
+          userId: transaction.userId,
+          message: alertMessage,
+          type: 'due_date',
+          referenceId: transaction.id,
+          referenceType: 'transaction',
+          isRead: false,
+        };
+        await this.createAlert(alertData);
+      }
+    }
+  }
+
+  async initializeSampleData(): Promise<{ success: boolean; userId?: number; message?: string }> {
+    try {
+      console.log('[initializeSampleData] Iniciando criação de dados de exemplo...');
+      const demoUserEmail = 'demo@example.com';
+      console.log('[initializeSampleData] Verificando se usuário demo já existe:', demoUserEmail);
+      
+      // Verificar se o método getUserByEmail existe
+      console.log('[initializeSampleData] Métodos disponíveis:', Object.getOwnPropertyNames(Object.getPrototypeOf(this)));
+      
+      if (!this.getUserByEmail) {
+        console.error('[initializeSampleData] ERRO: Método getUserByEmail não encontrado!');
+        return { success: false, message: 'Método getUserByEmail não implementado' };
+      }
+      
+      let user = await this.getUserByEmail(demoUserEmail);
+      console.log('[initializeSampleData] Resultado da busca por usuário:', user);
+
+      if (user) {
+        console.log('[initializeSampleData] Usuário demo já existe, ID:', user.id);
+        return { success: true, userId: user.id, message: 'Sample data already exists.' };
+      }
+
+      console.log('[initializeSampleData] Criando hash da senha para novo usuário demo...');
+      const hashedPassword = await bcrypt.hash('demopassword', 10);
+      console.log('[initializeSampleData] Hash da senha criado com sucesso');
+      
+      console.log('[initializeSampleData] Criando novo usuário demo...');
+      console.log('[initializeSampleData] Dados do usuário a ser criado:', {
+        name: 'Usuário Demo',
+        username: 'demouser',
+        email: demoUserEmail,
+        password: '********' // Não logamos a senha por segurança
+      });
+      
+      if (!this.createUser) {
+        console.error('[initializeSampleData] ERRO: Método createUser não encontrado!');
+        return { success: false, message: 'Método createUser não implementado' };
+      }
+      
+      user = await this.createUser({
+        name: 'Usuário Demo',
+        username: 'demouser',
+        email: demoUserEmail,
+        password: hashedPassword,
+      });
+      console.log('[initializeSampleData] Usuário demo criado com sucesso, ID:', user.id);
+      const newUserId = user.id;
+
+      console.log('[initializeSampleData] Preparando categorias de exemplo...');
+      const sampleCategoriesData = [
+        { name: 'Salário', type: 'income', icon: 'cash', color: '#2ecc71' },
+        { name: 'Moradia', type: 'expense', icon: 'home', color: '#e74c3c' },
+        { name: 'Alimentação', type: 'expense', icon: 'food', color: '#f1c40f' },
+      ];
+
+      const categoriesToInsert = sampleCategoriesData.map(c => ({ ...c, userId: newUserId }));
+      console.log('[initializeSampleData] Categorias a serem inseridas:', categoriesToInsert);
+      
+      if (!this.createManyCategories) {
+        console.error('[initializeSampleData] ERRO: Método createManyCategories não encontrado!');
+        return { success: false, message: 'Método createManyCategories não implementado' };
+      }
+      
+      console.log('[initializeSampleData] Inserindo categorias de exemplo...');
+      await this.createManyCategories(categoriesToInsert);
+      console.log('[initializeSampleData] Categorias de exemplo inseridas com sucesso');
+
+      console.log('[initializeSampleData] Dados de exemplo criados com sucesso para o usuário ID:', newUserId);
+      return { success: true, userId: newUserId };
+    } catch (error) {
+      const err = error as Error;
+      console.error('[initializeSampleData] Erro ao criar dados de exemplo:', err);
+      console.error('[initializeSampleData] Stack trace:', err.stack);
+      return { success: false, message: err.message };
+    }
   }
 }
 
-export class DatabaseStorage implements IStorage {
-  async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
-    return user;
-  }
-
-  async getCategories(userId: number): Promise<Category[]> {
-    return await db.select().from(categories).where(eq(categories.userId, userId));
-  }
-
-  async getCategoriesByType(userId: number, type: string): Promise<Category[]> {
-    return await db.select().from(categories).where(and(eq(categories.userId, userId), eq(categories.type, type)));
-  }
-
-  async createCategory(category: InsertCategory): Promise<Category> {
-    const [newCategory] = await db
-      .insert(categories)
-      .values(category)
-      .returning();
-    return newCategory;
-  }
-
-  async updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category | undefined> {
-    const [updated] = await db
-      .update(categories)
-      .set(category)
-      .where(eq(categories.id, id))
-      .returning();
-    return updated || undefined;
-  }
-
-  async deleteCategory(id: number): Promise<boolean> {
-    const result = await db.delete(categories).where(eq(categories.id, id));
-    return result.rowCount > 0;
-  }
-
-  async getTransactions(userId: number): Promise<Transaction[]> {
-    return await db.select().from(transactions).where(eq(transactions.userId, userId));
-  }
-
-  async getTransactionsByDateRange(userId: number, startDate: string, endDate: string): Promise<Transaction[]> {
-    return await db.select().from(transactions)
-      .where(and(eq(transactions.userId, userId), eq(transactions.date, startDate)));
-  }
-
-  async getTransactionsByType(userId: number, type: string): Promise<Transaction[]> {
-    return await db.select().from(transactions)
-      .where(and(eq(transactions.userId, userId), eq(transactions.type, type)));
-  }
-
-  async getUpcomingTransactions(userId: number, days: number): Promise<Transaction[]> {
-    return await db.select().from(transactions)
-      .where(and(eq(transactions.userId, userId), eq(transactions.status, 'pending')));
-  }
-
-  async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
-    const [newTransaction] = await db
-      .insert(transactions)
-      .values(transaction)
-      .returning();
-    return newTransaction;
-  }
-
-  async updateTransaction(id: number, transaction: Partial<InsertTransaction>): Promise<Transaction | undefined> {
-    const [updated] = await db
-      .update(transactions)
-      .set(transaction)
-      .where(eq(transactions.id, id))
-      .returning();
-    return updated || undefined;
-  }
-
-  async deleteTransaction(id: number): Promise<boolean> {
-    const result = await db.delete(transactions).where(eq(transactions.id, id));
-    return result.rowCount > 0;
-  }
-
-  async getGoals(userId: number): Promise<Goal[]> {
-    return await db.select().from(goals).where(eq(goals.userId, userId));
-  }
-
-  async createGoal(goal: InsertGoal): Promise<Goal> {
-    const [newGoal] = await db
-      .insert(goals)
-      .values(goal)
-      .returning();
-    return newGoal;
-  }
-
-  async updateGoal(id: number, goal: Partial<InsertGoal>): Promise<Goal | undefined> {
-    const [updated] = await db
-      .update(goals)
-      .set(goal)
-      .where(eq(goals.id, id))
-      .returning();
-    return updated || undefined;
-  }
-
-  async deleteGoal(id: number): Promise<boolean> {
-    const result = await db.delete(goals).where(eq(goals.id, id));
-    return result.rowCount > 0;
-  }
-
-  async getInvestments(userId: number): Promise<Investment[]> {
-    return await db.select().from(investments).where(eq(investments.userId, userId));
-  }
-
-  async createInvestment(investment: InsertInvestment): Promise<Investment> {
-    const [newInvestment] = await db
-      .insert(investments)
-      .values(investment)
-      .returning();
-    return newInvestment;
-  }
-
-  async updateInvestment(id: number, investment: Partial<InsertInvestment>): Promise<Investment | undefined> {
-    const [updated] = await db
-      .update(investments)
-      .set(investment)
-      .where(eq(investments.id, id))
-      .returning();
-    return updated || undefined;
-  }
-
-  async deleteInvestment(id: number): Promise<boolean> {
-    const result = await db.delete(investments).where(eq(investments.id, id));
-    return result.rowCount > 0;
-  }
-
-  async getAlerts(userId: number): Promise<Alert[]> {
-    return await db.select().from(alerts).where(eq(alerts.userId, userId));
-  }
-
-  async getUnreadAlerts(userId: number): Promise<Alert[]> {
-    return await db.select().from(alerts)
-      .where(eq(alerts.userId, userId))
-      .where(eq(alerts.isRead, false));
-  }
-
-  async createAlert(alert: InsertAlert): Promise<Alert> {
-    const [newAlert] = await db
-      .insert(alerts)
-      .values(alert)
-      .returning();
-    return newAlert;
-  }
-
-  async markAlertAsRead(id: number): Promise<boolean> {
-    const result = await db
-      .update(alerts)
-      .set({ isRead: true })
-      .where(eq(alerts.id, id));
-    return result.rowCount > 0;
-  }
-
-  async deleteAlert(id: number): Promise<boolean> {
-    const result = await db.delete(alerts).where(eq(alerts.id, id));
-    return result.rowCount > 0;
-  }
-}
-
-export const storage = new DatabaseStorage();
+export const storage: IAppStorage = new DatabaseStorage();

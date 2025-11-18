@@ -6,12 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { queryClient } from "@/lib/queryClient";
-import { apiRequest } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { formatCurrency } from "@/lib/currency";
 import { formatDate } from "@/lib/date";
 import { Plus, Edit, Trash2, Coins } from "lucide-react";
 import IncomeForm from "@/components/forms/income-form";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface Transaction {
   id: number;
@@ -30,34 +31,39 @@ interface Category {
 }
 
 export default function Income() {
+  const { t } = useTranslation();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Transaction | null>(null);
   const { toast } = useToast();
 
   const { data: incomes, isLoading: incomesLoading } = useQuery<Transaction[]>({
-    queryKey: ["/api/transactions?type=income"],
+    queryKey: ["transactions", "income"],
+    queryFn: () => api("/api/transactions?type=income"),
   });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
-    queryKey: ["/api/categories?type=income"],
+    queryKey: ["categories", "income"],
+    queryFn: () => api("/api/categories?type=income"),
   });
 
   const deleteIncomeMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest("DELETE", `/api/transactions/${id}`);
+      return api(`/api/transactions/${id}`, { method: 'DELETE' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions?type=income"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/summary"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions", "income"] });
+      // Atualiza Relatórios (usa key "/api/transactions")
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "summary"] });
       toast({
-        title: "Receita excluída",
-        description: "A receita foi excluída com sucesso.",
+        title: t('income.deleteSuccess.title'),
+        description: t('income.deleteSuccess.description'),
       });
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível excluir a receita.",
+        title: t('common.error'),
+        description: t('income.deleteError'),
         variant: "destructive",
       });
     },
@@ -65,20 +71,22 @@ export default function Income() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      return apiRequest("PUT", `/api/transactions/${id}`, { status });
+      return api(`/api/transactions/${id}`, { method: 'PUT', body: JSON.stringify({ status }) });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions?type=income"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/summary"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions", "income"] });
+      // Atualiza Relatórios (usa key "/api/transactions")
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "summary"] });
       toast({
-        title: "Status atualizado",
-        description: "O status da receita foi atualizado com sucesso.",
+        title: t('income.statusUpdate.title'),
+        description: t('income.statusUpdate.description'),
       });
     },
     onError: () => {
       toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o status da receita.",
+        title: t('common.error'),
+        description: t('income.statusUpdateError'),
         variant: "destructive",
       });
     },
@@ -91,7 +99,7 @@ export default function Income() {
       <div className="flex flex-col h-full">
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-800">Receitas</h2>
+            <h2 className="text-2xl font-bold text-gray-800">{t('income.title')}</h2>
             <Skeleton className="h-10 w-32" />
           </div>
         </header>
@@ -129,10 +137,10 @@ export default function Income() {
       <div className="flex flex-col h-full">
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-800">Receitas</h2>
+            <h2 className="text-2xl font-bold text-gray-800">{t('income.title')}</h2>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
-              Nova Receita
+              {t('income.new')}
             </Button>
           </div>
         </header>
@@ -140,7 +148,7 @@ export default function Income() {
           <Card>
             <CardContent className="p-6">
               <div className="text-center py-8 text-gray-500">
-                Erro ao carregar receitas
+                {t('income.loadError')}
               </div>
             </CardContent>
           </Card>
@@ -150,7 +158,7 @@ export default function Income() {
   }
 
   const getCategoryName = (categoryId: number): string => {
-    return categories.find(c => c.id === categoryId)?.name || "Outros";
+    return categories.find(c => c.id === categoryId)?.name || t('categories.others');
   };
 
   const getCategoryColor = (categoryId: number): string => {
@@ -171,9 +179,9 @@ export default function Income() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'received':
-        return 'Recebido';
+        return t('transactions.status.received');
       case 'pending':
-        return 'Pendente';
+        return t('transactions.status.pending');
       default:
         return status;
     }
@@ -185,7 +193,7 @@ export default function Income() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Tem certeza que deseja excluir esta receita?')) {
+    if (confirm(t('income.confirmDelete'))) {
       deleteIncomeMutation.mutate(id);
     }
   };
@@ -204,13 +212,13 @@ export default function Income() {
       <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Receitas</h2>
+            <h2 className="text-2xl font-bold text-gray-800">{t('income.title')}</h2>
             <div className="flex space-x-6 mt-2">
               <span className="text-sm text-gray-600">
-                Total Recebido: <span className="font-semibold text-green-600">{formatCurrency(totalReceived)}</span>
+                {t('income.totalReceived')}: <span className="font-semibold text-green-600">{formatCurrency(totalReceived)}</span>
               </span>
               <span className="text-sm text-gray-600">
-                Pendente: <span className="font-semibold text-orange-600">{formatCurrency(pendingIncome)}</span>
+                {t('income.pending')}: <span className="font-semibold text-orange-600">{formatCurrency(pendingIncome)}</span>
               </span>
             </div>
           </div>
@@ -219,17 +227,19 @@ export default function Income() {
             <DialogTrigger asChild>
               <Button className="bg-primary hover:bg-primary/90">
                 <Plus className="h-4 w-4 mr-2" />
-                Nova Receita
+                {t('income.new')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle>Nova Receita</DialogTitle>
+                <DialogTitle>{t('income.new')}</DialogTitle>
               </DialogHeader>
               <IncomeForm
                 onSuccess={() => {
                   setIsCreateOpen(false);
-                  queryClient.invalidateQueries({ queryKey: ["/api/transactions?type=income"] });
+                  queryClient.invalidateQueries({ queryKey: ["transactions", "income"] });
+                  // Atualiza Relatórios (usa key "/api/transactions")
+                  queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
                   queryClient.invalidateQueries({ queryKey: ["/api/dashboard/summary"] });
                 }}
                 categories={categories}
@@ -245,7 +255,7 @@ export default function Income() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Coins className="h-5 w-5 mr-2" />
-              Lista de Receitas
+              {t('income.list')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -253,14 +263,14 @@ export default function Income() {
               <div className="text-center py-12">
                 <Coins className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Nenhuma receita cadastrada
+                  {t('income.empty.title')}
                 </h3>
                 <p className="text-gray-500 mb-4">
-                  Comece adicionando sua primeira receita.
+                  {t('income.empty.description')}
                 </p>
                 <Button onClick={() => setIsCreateOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Receita
+                  {t('income.add')}
                 </Button>
               </div>
             ) : (
@@ -281,7 +291,7 @@ export default function Income() {
                             <span>{getCategoryName(income.categoryId)}</span>
                             {income.isRecurring && (
                               <Badge variant="outline" className="text-xs">
-                                Recorrente
+                                {t('income.recurring')}
                               </Badge>
                             )}
                           </div>
@@ -334,13 +344,15 @@ export default function Income() {
         <Dialog open={!!editingIncome} onOpenChange={() => setEditingIncome(null)}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Editar Receita</DialogTitle>
+              <DialogTitle>{t('income.edit')}</DialogTitle>
             </DialogHeader>
             <IncomeForm
               initialData={editingIncome}
               onSuccess={() => {
                 setEditingIncome(null);
-                queryClient.invalidateQueries({ queryKey: ["/api/transactions?type=income"] });
+                queryClient.invalidateQueries({ queryKey: ["transactions", "income"] });
+                // Atualiza Relatórios (usa key "/api/transactions")
+                queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
                 queryClient.invalidateQueries({ queryKey: ["/api/dashboard/summary"] });
               }}
               categories={categories}

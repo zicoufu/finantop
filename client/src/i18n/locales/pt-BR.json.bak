@@ -1,0 +1,420 @@
+{
+  "translation": {
+    "app": {
+      "title": "FinanceApp"
+    },
+    "preferences": {
+      "title": "Preferências do Usuário",
+      "personalSettings": "Configurações Pessoais",
+      "language": "Idioma",
+      "selectLanguage": "Selecione o idioma",
+      "theme": "Tema",
+      "selectTheme": "Selecione o tema",
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema",
+      "currency": "Moeda",
+      "selectCurrency": "Selecione a moeda",
+      "dateFormat": "Formato de Data",
+      "selectDateFormat": "Selecione o formato de data",
+      "savePreferences": "Salvar Preferências",
+      "success": "Preferências atualizadas",
+      "preferencesUpdated": "Suas preferências foram atualizadas com sucesso.",
+      "updateError": "Ocorreu um erro ao atualizar suas preferências."
+    },
+    "common": {
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "loading": "Carregando...",
+      "search": "Buscar",
+      "filter": "Filtrar",
+      "yes": "Sim",
+      "no": "Não",
+      "confirm": "Confirmar",
+      "success": "Sucesso",
+      "error": "Erro",
+      "user": "Usuário"
+    },
+    "auth": {
+      "login": "Entrar",
+      "register": "Registrar",
+      "logout": "Sair",
+      "email": "Email",
+      "password": "Senha",
+      "username": "Nome de usuário",
+      "name": "Nome completo",
+      "createAccount": "Criar conta",
+      "alreadyHaveAccount": "Já tem uma conta?",
+      "dontHaveAccount": "Não tem uma conta?",
+      "loginSuccess": "Login realizado com sucesso!",
+      "registerSuccess": "Registro realizado com sucesso!",
+      "passwordRequirements": "A senha deve conter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais."
+    },
+    "dashboard": {
+      "title": "Dashboard Financeiro",
+      "currentBalance": "Saldo Atual",
+      "monthlyIncome": "Receitas do Mês",
+      "monthlyExpenses": "Despesas do Mês",
+      "totalInvestments": "Total em Investimentos",
+      "upcomingBills": "Próximas Contas",
+      "goals": "Minhas Metas",
+      "expensesByCategory": "Gastos por Categoria",
+      "balanceEvolution": "Evolução do Saldo",
+      "noUpcomingBills": "Nenhuma conta próxima ao vencimento",
+      "noGoalsDefined": "Você ainda não tem metas definidas",
+      "createGoal": "Criar Meta",
+      "viewAllGoals": "Ver todas as metas",
+      "viewAll": "Ver todas",
+      "errorLoading": "Erro ao carregar dados do dashboard",
+      "previousMonth": "mês anterior",
+      "recentTransactions": "Transações Recentes",
+      "noTransactions": "Nenhuma transação encontrada",
+      "noData": {
+        "title": "Sem dados financeiros",
+        "description": "Adicione transações para visualizar seu relatório financeiro."
+      },
+      "error": {
+        "title": "Erro ao carregar dados",
+        "description": "Ocorreu um erro ao carregar os dados do relatório financeiro."
+      },
+      "charts": {
+        "errorLoading": "Erro ao carregar dados do gráfico",
+        "noData": "Nenhum dado disponível",
+        "noExpenses": "Nenhum gasto registrado",
+        "balance": "Saldo",
+        "income": "Receitas",
+        "expenses": "Despesas"
+      },
+      "periods": {
+        "currentMonth": "Este mês",
+        "lastMonth": "Último mês",
+        "last3Months": "Últimos 3 meses",
+        "currentYear": "Este ano"
+      },
+      "errorLoadingGoals": "Erro ao carregar metas"
+    },
+    "transactions": {
+      "title": "Transações",
+      "newTransaction": "Nova Transação",
+      "addTransaction": "Adicionar Transação",
+      "newExpense": "Nova Despesa",
+      "fillExpenseDetails": "Preencha os detalhes para adicionar uma nova despesa.",
+      "income": "Receita",
+      "expense": "Despesa",
+      "transfer": "Transferência",
+      "filters": {
+        "all": "Todas",
+        "income": "Receitas",
+        "expense": "Despesas"
+      },
+      "description": "Descrição",
+      "amount": "Valor",
+      "date": "Data",
+      "category": "Categoria",
+      "type": "Tipo",
+      "status": {
+        "label": "Status",
+        "pending": "Pendente",
+        "paid": "Pago",
+        "received": "Recebido",
+        "overdue": "Atrasado"
+      },
+      "fixed": "Fixo",
+      "variable": "Variável",
+      "recurring": "Recorrente",
+      "dueDate": "Data de vencimento",
+      "dateNotDefined": "Data não definida",
+      "noTransactions": "Nenhuma transação encontrada"
+    },
+    "categories": {
+      "title": "Categorias",
+      "newCategory": "Nova Categoria",
+      "name": "Nome",
+      "type": "Tipo",
+      "color": "Cor",
+      "icon": "Ícone",
+      "noCategories": "Nenhuma categoria encontrada",
+      "others": "Outros",
+      "housing": "Moradia e Habitação",
+      "food": "Alimentação",
+      "transportation": "Transporte",
+      "entertainment": "Entretenimento",
+      "health": "Saúde",
+      "education": "Educação",
+      "utilities": "Serviços Públicos"
+    },
+    "goals": {
+      "title": "Metas",
+      "newGoal": "Nova Meta",
+      "name": "Nome",
+      "targetAmount": "Valor alvo",
+      "currentAmount": "Valor atual",
+      "targetDate": "Data alvo",
+      "monthlyContribution": "Contribuição mensal",
+      "annualInterestRate": "Taxa de juros anual",
+      "description": "Descrição",
+      "progress": "Progresso",
+      "noGoals": "Nenhuma meta encontrada",
+      "totalGoals": "Total das Metas",
+      "totalSaved": "Total Economizado",
+      "saved": "Economizado",
+      "target": "Meta",
+      "remaining": "Restante",
+      "addValue": "Adicionar Valor",
+      "estimate": "Estimativa",
+      "months": "meses",
+      "finalValue": "Valor final"
+    },
+    "investments": {
+      "title": "Investimentos",
+      "newInvestment": "Novo Investimento",
+      "name": "Nome",
+      "type": "Tipo",
+      "amount": "Valor",
+      "interestRate": "Taxa de juros",
+      "startDate": "Data de início",
+      "maturityDate": "Data de vencimento",
+      "noInvestments": "Nenhum investimento encontrado",
+      "simulation": "Simulação",
+      "years": "Anos",
+      "calculate": "Calcular",
+      "result": "Resultado",
+      "finalAmount": "Valor final",
+      "totalInterest": "Juros totais",
+      "monthlyContribution": "Contribuição mensal",
+      "totalInvested": "Total Investido",
+      "portfolio": "Portfolio",
+      "simulator": "Simulador",
+      "myInvestments": "Meus Investimentos",
+      "startAddingInvestments": "Comece adicionando seus primeiros investimentos.",
+      "addInvestment": "Adicionar Investimento",
+      "editInvestment": "Editar Investimento"
+    },
+    "expenses": {
+      "title": "Despesas",
+      "newExpense": "Nova Despesa",
+      "addExpense": "Adicionar Despesa",
+      "editExpense": "Editar Despesa",
+      "new": "Nova Despesa",
+      "add": "Adicionar Despesa",
+      "edit": "Editar Despesa",
+      "list": "Lista de Despesas",
+      "totalPaid": "Total Pago",
+      "pending": "Pendente",
+      "fixed": "Fixas",
+      "variable": "Variáveis",
+      "expenseList": "Lista de Despesas",
+      "allExpenses": "Todas as Despesas",
+      "fixedExpenses": "Despesas Fixas",
+      "variableExpenses": "Despesas Variáveis",
+      "noExpenses": "Nenhuma despesa cadastrada",
+      "startAddingExpense": "Comece adicionando sua primeira despesa.",
+      "deleteConfirm": "Tem certeza que deseja excluir esta despesa?",
+      "confirmDelete": "Tem certeza que deseja excluir esta despesa?",
+      "expenseDeleted": "Despesa excluída",
+      "expenseDeletedDesc": "A despesa foi excluída com sucesso.",
+      "statusUpdated": "Status atualizado",
+      "statusUpdatedDesc": "O status da despesa foi atualizado com sucesso.",
+      "errorLoading": "Erro ao carregar despesas",
+      "errorDeleting": "Não foi possível excluir a despesa.",
+      "errorUpdating": "Não foi possível atualizar o status da despesa.",
+      "dueDate": "Vence",
+      "loadError": "Erro ao carregar despesas",
+      "deleteSuccess": {
+        "title": "Despesa excluída",
+        "description": "A despesa foi excluída com sucesso"
+      },
+      "deleteError": "Erro ao excluir despesa",
+      "statusUpdate": {
+        "title": "Status atualizado",
+        "description": "O status da despesa foi atualizado com sucesso"
+      },
+      "statusUpdateError": "Erro ao atualizar status da despesa",
+      "filterByType": "Filtrar por tipo",
+      "filters": {
+        "all": "Todas",
+        "fixed": "Fixas",
+        "variable": "Variáveis"
+      },
+      "types": {
+        "fixed": "Fixa",
+        "variable": "Variável"
+      },
+      "recurring": "Recorrente",
+      "empty": {
+        "title": "Nenhuma despesa encontrada",
+        "description": "Você ainda não tem despesas cadastradas."
+      },
+      "validation": {
+        "descriptionRequired": "Descrição é obrigatória",
+        "amountRequired": "Valor é obrigatório",
+        "dateFormat": "Data deve estar no formato AAAA-MM-DD",
+        "dueDateFormat": "Data de vencimento deve estar no formato AAAA-MM-DD",
+        "categoryRequired": "Categoria é obrigatória"
+      },
+      "created": "Despesa criada",
+      "createdSuccess": "A despesa foi criada com sucesso",
+      "createError": "Erro ao criar despesa",
+      "updated": "Despesa atualizada",
+      "updatedSuccess": "A despesa foi atualizada com sucesso",
+      "updateError": "Erro ao atualizar despesa"
+    },
+    "goals": {
+      "title": "Metas",
+      "financialGoals": "Metas Financeiras",
+      "newGoal": "Nova Meta",
+      "createGoal": "Criar Meta",
+      "editGoal": "Editar Meta",
+      "noGoals": "Nenhuma meta cadastrada",
+      "startAddingGoals": "Comece adicionando sua primeira meta financeira.",
+      "totalGoals": "Total de metas",
+      "totalSaved": "Total economizado",
+      "progress": "Progresso",
+      "saved": "Economizado",
+      "target": "Meta",
+      "remaining": "Restante",
+      "targetDate": "Data alvo",
+      "addValue": "Adicionar valor",
+      "achieved": "Meta alcançada!",
+      "deleteConfirm": "Tem certeza que deseja excluir esta meta?",
+      "enterAmount": "Digite o valor a ser adicionado:",
+      "deleteSuccess": {
+        "title": "Meta excluída",
+        "description": "A meta foi excluída com sucesso."
+      },
+      "deleteError": "Erro ao excluir meta",
+      "addValueSuccess": {
+        "title": "Valor adicionado",
+        "description": "O valor foi adicionado à meta com sucesso."
+      },
+      "addValueError": "Erro ao adicionar valor à meta",
+      "notFound": "Meta não encontrada",
+      "estimateMonths": "Estimativa: {{months}} meses economizando {{amount}}/mês",
+      "estimateYearsMonths": "Estimativa: {{years}} anos e {{months}} meses economizando {{amount}}/mês",
+      "messages": {
+        "createSuccess": "Meta criada com sucesso",
+        "createError": "Erro ao criar meta",
+        "updateSuccess": "Meta atualizada com sucesso",
+        "updateError": "Erro ao atualizar meta"
+      },
+      "validation": {
+        "nameRequired": "Nome da meta é obrigatório",
+        "targetAmountRequired": "Valor alvo é obrigatório",
+        "contributionPositive": "A contribuição mensal deve ser um valor positivo",
+        "interestRateMin": "A taxa de juros anual deve ser um valor positivo",
+        "interestRateMax": "A taxa de juros anual não pode ser maior que 100%"
+      },
+      "form": {
+        "name": "Nome da meta",
+        "namePlaceholder": "Ex: Comprar uma casa",
+        "targetAmount": "Valor alvo",
+        "currentAmount": "Valor atual",
+        "targetDate": "Data alvo",
+        "monthlyContribution": "Contribuição mensal",
+        "annualInterestRate": "Taxa de juros anual (%)",
+        "description": "Descrição",
+        "descriptionPlaceholder": "Descreva sua meta financeira...",
+        "create": "Criar meta"
+      }
+    },
+    "income": {
+      "title": "Receitas",
+      "newIncome": "Nova Receita",
+      "addIncome": "Adicionar Receita",
+      "editIncome": "Editar Receita",
+      "totalReceived": "Total Recebido",
+      "pending": "Pendente",
+      "incomeList": "Lista de Receitas",
+      "noIncome": "Nenhuma receita cadastrada",
+      "startAddingIncome": "Comece adicionando sua primeira receita."
+    },
+    "alerts": {
+      "title": "Alertas",
+      "unreadCount": "Você tem {count} alerta(s) não lido(s)",
+      "unread": "Não Lidos",
+      "all": "Todos",
+      "dueDate": "Vencimento",
+      "badge": {
+        "new": "Novo"
+      },
+      "expiresToday": "A despesa '{expense}' vence hoje",
+      "expiredDays": "A despesa '{expense}' venceu há {days} dia(s)",
+      "types": {
+        "dueDate": "Vencimento",
+        "overdue": "Atrasado",
+        "goalMilestone": "Meta Alcançada",
+        "investmentMaturity": "Vencimento de Investimento",
+        "general": "Geral"
+      },
+      "markAsRead": {
+        "success": {
+          "title": "Alerta marcado como lido",
+          "description": "O alerta foi marcado como lido com sucesso"
+        },
+        "error": "Erro ao marcar alerta como lido"
+      },
+      "delete": {
+        "success": {
+          "title": "Alerta excluído",
+          "description": "O alerta foi excluído com sucesso"
+        },
+        "error": "Erro ao excluir alerta"
+      },
+      "deleteConfirm": "Tem certeza que deseja excluir este alerta?",
+      "actions": {
+        "markAsRead": "Marcar como lido",
+        "delete": "Excluir alerta"
+      },
+      "tabs": {
+        "unread": "Não Lidos",
+        "all": "Todos"
+      },
+      "empty": {
+        "unread": {
+          "title": "Nenhum alerta não lido",
+          "description": "Você não tem alertas não lidos no momento."
+        },
+        "all": {
+          "title": "Nenhum alerta",
+          "description": "Você não tem alertas no momento."
+    },
+    "markAsRead": {
+      "success": {
+        "title": "Alerta marcado como lido",
+        "description": "O alerta foi marcado como lido com sucesso"
+      },
+      "error": "Erro ao marcar alerta como lido"
+    },
+    "delete": {
+      "success": {
+        "title": "Alerta excluído",
+        "description": "O alerta foi excluído com sucesso"
+      },
+      "error": "Erro ao excluir alerta"
+    "preferences": {
+      "title": "Preferências do Usuário",
+      "personalSettings": "Configurações Pessoais",
+      "language": "Idioma",
+      "theme": "Tema",
+      "currency": "Moeda",
+      "dateFormat": "Formato de Data",
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema",
+      "savePreferences": "Salvar Preferências",
+      "preferencesUpdated": "Suas preferências foram atualizadas com sucesso."
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "expenses": "Despesas",
+      "income": "Receitas",
+      "investments": "Investimentos",
+      "goals": "Metas",
+      "alerts": "Alertas",
+      "reports": "Relatórios",
+      "preferences": "Preferências"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+.category-color-dot {
+  background-color: attr(data-color);
+}
+
+/* Fallback para navegadores que não suportam attr() para propriedades CSS não-content */
+[data-color] {
+  background-color: currentColor;
+}
+
+/* Cores específicas para categorias comuns */
+[data-color="#FF5733"] { background-color: #FF5733; }
+[data-color="#33FF57"] { background-color: #33FF57; }
+[data-color="#3357FF"] { background-color: #3357FF; }
+[data-color="#F3FF33"] { background-color: #F3FF33; }
+[data-color="#FF33F3"] { background-color: #FF33F3; }
+[data-color="#33FFF3"] { background-color: #33FFF3; }

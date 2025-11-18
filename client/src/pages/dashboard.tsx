@@ -1,69 +1,105 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Menu } from "lucide-react";
-import KPICards from "@/components/dashboard/kpi-cards";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
+import ExpenseForm from "@/components/forms/expense-form";
+import RecentTransactions from "@/components/dashboard/recent-transactions";
+import { Category } from "@/lib/types";
+import { api } from "@/lib/api";
+import { useTranslation } from "react-i18next";
+import SidebarFilters from "@/components/dashboard/sidebar-filters";
+import KPIHero from "@/components/dashboard/kpi-hero";
+import { TopIncomeCategories, CategoryKPIsGrid } from "@/components/dashboard/top-sections";
 import ExpenseChart from "@/components/dashboard/expense-chart";
 import BalanceChart from "@/components/dashboard/balance-chart";
-import UpcomingBills from "@/components/dashboard/upcoming-bills";
-import GoalsProgress from "@/components/dashboard/goals-progress";
-import RecentTransactions from "@/components/dashboard/recent-transactions";
 
 export default function Dashboard() {
   const [period, setPeriod] = useState("current-month");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const { t } = useTranslation();
+
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ["categories", "expense"],
+    queryFn: () => api("/api/categories?type=expense"),
+  });
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <h2 className="text-2xl font-bold text-gray-800">Dashboard Financeiro</h2>
+    <div className="flex h-full">
+      <SidebarFilters />
+      <main className="flex-1 flex flex-col h-full">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-4">
+              <h2 className="text-2xl font-bold text-gray-800">{t('dashboard.title')}</h2>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <Select value={period} onValueChange={setPeriod}>
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="current-month">{t('dashboard.periods.currentMonth')}</SelectItem>
+                  <SelectItem value="last-month">{t('dashboard.periods.lastMonth')}</SelectItem>
+                  <SelectItem value="last-3-months">{t('dashboard.periods.last3Months')}</SelectItem>
+                  <SelectItem value="current-year">{t('dashboard.periods.currentYear')}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary hover:bg-primary/90">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('transactions.newTransaction')}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{t('transactions.newExpense')}</DialogTitle>
+                    <DialogDescription>{t('transactions.fillExpenseDetails')}</DialogDescription>
+                  </DialogHeader>
+                  <ExpenseForm
+                    onSuccess={() => {
+                      setIsCreateOpen(false);
+                      // Opcional: invalidar queries para atualizar dados do dashboard
+                    }}
+                    categories={categories}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
-          
-          <div className="flex items-center space-x-4">
-            <Select value={period} onValueChange={setPeriod}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="current-month">Este mês</SelectItem>
-                <SelectItem value="last-month">Último mês</SelectItem>
-                <SelectItem value="last-3-months">Últimos 3 meses</SelectItem>
-                <SelectItem value="current-year">Este ano</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button className="bg-primary hover:bg-primary/90">
-              <Plus className="h-4 w-4 mr-2" />
-              Nova Transação
-            </Button>
+        </header>
+
+        {/* Dashboard Content */}
+        <div className="p-6 space-y-6 overflow-y-auto flex-1">
+          {/* Hero KPIs matching visual design */}
+          <KPIHero />
+
+          {/* Top sections grid: incomes and expenses categories */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <TopIncomeCategories />
+            <ExpenseChart />
           </div>
-        </div>
-      </header>
 
-      {/* Dashboard Content */}
-      <div className="p-6 space-y-6 overflow-y-auto flex-1">
-        {/* KPI Cards */}
-        <KPICards />
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ExpenseChart />
-          <BalanceChart />
-        </div>
-
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <UpcomingBills />
+          {/* Evolution monthly combined chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <BalanceChart />
           </div>
-          <GoalsProgress />
-        </div>
 
-        {/* Recent Transactions */}
-        <RecentTransactions />
-      </div>
+          {/* Category KPI mini-cards grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <CategoryKPIsGrid />
+          </div>
+
+          {/* Keep existing recent transactions list below */}
+          <RecentTransactions />
+        </div>
+      </main>
     </div>
   );
 }
+

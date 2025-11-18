@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +10,8 @@ import { formatCurrency } from "@/lib/currency";
 import { formatDate, getCurrentMonth, getCurrentMonthRange } from "@/lib/date";
 import { FileText, Download, TrendingUp, TrendingDown, DollarSign, Target, Calendar } from "lucide-react";
 import { Bar } from "react-chartjs-2";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -63,25 +66,37 @@ interface Investment {
 }
 
 export default function Reports() {
+  const { t } = useTranslation();
   const [period, setPeriod] = useState("current-month");
 
   const { data: transactions, isLoading: transactionsLoading } = useQuery<Transaction[]>({
     queryKey: ["/api/transactions"],
+    queryFn: () => api("/api/transactions")
   });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
+    queryFn: () => api("/api/categories")
   });
 
   const { data: goals, isLoading: goalsLoading } = useQuery<Goal[]>({
     queryKey: ["/api/goals"],
+    queryFn: () => api("/api/goals")
   });
 
   const { data: investments, isLoading: investmentsLoading } = useQuery<Investment[]>({
     queryKey: ["/api/investments"],
+    queryFn: () => api("/api/investments")
   });
 
   const isLoading = transactionsLoading || categoriesLoading || goalsLoading || investmentsLoading;
+
+  // Verificar se há dados e exibir aviso se necessário (sem redirecionar)
+  useEffect(() => {
+    if (!isLoading && transactions && transactions.length === 0) {
+      toast.info(t('reports.noTransactions', 'Sem transações registradas'));
+    }
+  }, [transactions, isLoading, t]);
 
   const filterTransactionsByPeriod = (transactions: Transaction[], period: string) => {
     const now = new Date();
@@ -114,15 +129,15 @@ export default function Reports() {
   const getPeriodLabel = (period: string) => {
     switch (period) {
       case "current-month":
-        return "Este Mês";
+        return t('reports.period.currentMonth');
       case "last-month":
-        return "Último Mês";
+        return t('reports.period.lastMonth');
       case "last-3-months":
-        return "Últimos 3 Meses";
+        return t('reports.period.last3Months');
       case "current-year":
-        return "Este Ano";
+        return t('reports.period.currentYear');
       default:
-        return "Período";
+        return t('reports.period.default');
     }
   };
 
@@ -144,7 +159,7 @@ export default function Reports() {
       labels: data.map(item => item.category),
       datasets: [
         {
-          label: 'Despesas por Categoria',
+          label: t('reports.charts.expensesByCategory'),
           data: data.map(item => item.amount),
           backgroundColor: data.map(item => item.color),
           borderWidth: 1,
@@ -155,43 +170,53 @@ export default function Reports() {
 
   const generateMonthlyComparison = (transactions: Transaction[]) => {
     const monthlyData: { [key: string]: { income: number; expense: number } } = {};
+    const now = new Date();
+    
+    // Determine the last 6 calendar months
+    const targetMonths: string[] = [];
+    for (let i = 5; i >= 0; i--) { // Iterate from 5 months ago to current month
+      const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = `${monthDate.getFullYear()}-${String(monthDate.getMonth() + 1).padStart(2, '0')}`;
+      targetMonths.push(monthKey);
+      monthlyData[monthKey] = { income: 0, expense: 0 }; // Initialize for all target months
+    }
     
     transactions.forEach(t => {
       if (t.status !== 'paid' && t.status !== 'received') return;
       
       const date = new Date(t.date);
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const transactionMonthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       
-      if (!monthlyData[monthKey]) {
-        monthlyData[monthKey] = { income: 0, expense: 0 };
-      }
-      
-      const amount = parseFloat(t.amount);
-      if (t.type === 'income') {
-        monthlyData[monthKey].income += amount;
-      } else {
-        monthlyData[monthKey].expense += amount;
+      // Only process transactions that fall within our target 6 months
+      if (monthlyData.hasOwnProperty(transactionMonthKey)) {
+        const amount = parseFloat(t.amount);
+        if (t.type === 'income') {
+          monthlyData[transactionMonthKey].income += amount;
+        } else {
+          monthlyData[transactionMonthKey].expense += amount;
+        }
       }
     });
 
-    const sortedMonths = Object.keys(monthlyData).sort().slice(-6); // Last 6 months
+    // targetMonths is already sorted and represents the last 6 calendar months
+    const sortedMonths = targetMonths; 
     
     return {
       labels: sortedMonths.map(month => {
         const [year, monthNum] = month.split('-');
-        return new Date(parseInt(year), parseInt(monthNum) - 1).toLocaleDateString('pt-BR', { 
-          month: 'short', 
-          year: 'numeric' 
-        });
+        // Usar o idioma atual do usuário em vez de forçar português
+        const date = new Date(parseInt(year), parseInt(monthNum) - 1);
+        const monthName = t(`months.${['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][date.getMonth()]}`);
+        return `${monthName} ${date.getFullYear()}`;
       }),
       datasets: [
         {
-          label: 'Receitas',
+          label: t('reports.summary.income'),
           data: sortedMonths.map(month => monthlyData[month].income),
           backgroundColor: 'hsl(142, 76%, 36%)',
         },
         {
-          label: 'Despesas',
+          label: t('reports.summary.expenses'),
           data: sortedMonths.map(month => monthlyData[month].expense),
           backgroundColor: 'hsl(0, 84%, 60%)',
         },
@@ -236,21 +261,23 @@ export default function Reports() {
     const categoryMap = categories ? Object.fromEntries(categories.map(c => [c.id, c.name])) : {};
     
     const csvContent = [
-      ['Data', 'Descrição', 'Categoria', 'Tipo', 'Valor', 'Status'].join(','),
-      ...filteredTransactions.map(t => [
-        formatDate(t.date),
-        t.description,
-        categoryMap[t.categoryId] || 'Outros',
-        t.type === 'income' ? 'Receita' : 'Despesa',
-        parseFloat(t.amount).toFixed(2),
-        t.status
+      [t('reports.table.date'), t('reports.table.description'), t('reports.table.category'), t('reports.table.type'), t('reports.table.amount'), t('reports.table.status')].join(','),
+      ...filteredTransactions.map(transaction => [
+        formatDate(transaction.date),
+        transaction.description,
+        categoryMap[transaction.categoryId] || t('common.others'),
+        transaction.type === 'income' ? t('transactions.type.income') : t('transactions.type.expense'),
+        parseFloat(transaction.amount).toFixed(2),
+        transaction.status === 'paid' ? t('transactions.status.paid') :
+        transaction.status === 'received' ? t('transactions.status.received') :
+        transaction.status === 'pending' ? t('transactions.status.pending') : t('transactions.status.overdue')
       ].map(field => `"${field}"`).join(','))
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `relatorio_financeiro_${period}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `${t('reports.filename')}_${period}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
   };
 
@@ -259,7 +286,7 @@ export default function Reports() {
       <div className="flex flex-col h-full">
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-800">Relatórios</h2>
+            <h2 className="text-2xl font-bold text-gray-800">{t('reports.title')}</h2>
             <div className="flex space-x-4">
               <Skeleton className="h-10 w-32" />
               <Skeleton className="h-10 w-24" />
@@ -297,13 +324,13 @@ export default function Reports() {
     return (
       <div className="flex flex-col h-full">
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-          <h2 className="text-2xl font-bold text-gray-800">Relatórios</h2>
+          <h2 className="text-2xl font-bold text-gray-800">{t('reports.title')}</h2>
         </header>
         <div className="p-6 flex-1">
           <Card>
             <CardContent className="p-6">
               <div className="text-center py-8 text-gray-500">
-                Erro ao carregar dados dos relatórios
+                {t('reports.errorLoading')}
               </div>
             </CardContent>
           </Card>
@@ -349,23 +376,23 @@ export default function Reports() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-800">Relatórios</h2>
+          <h2 className="text-2xl font-bold text-gray-800">{t('reports.title')}</h2>
           <div className="flex items-center space-x-4">
             <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="current-month">Este mês</SelectItem>
-                <SelectItem value="last-month">Último mês</SelectItem>
-                <SelectItem value="last-3-months">Últimos 3 meses</SelectItem>
-                <SelectItem value="current-year">Este ano</SelectItem>
+                <SelectItem value="current-month">{t('reports.period.currentMonth')}</SelectItem>
+                <SelectItem value="last-month">{t('reports.period.lastMonth')}</SelectItem>
+                <SelectItem value="last-3-months">{t('reports.period.last3Months')}</SelectItem>
+                <SelectItem value="current-year">{t('reports.period.currentYear')}</SelectItem>
               </SelectContent>
             </Select>
             
             <Button variant="outline" onClick={exportToCSV}>
               <Download className="h-4 w-4 mr-2" />
-              Exportar
+              {t('reports.export')}
             </Button>
           </div>
         </div>
@@ -375,8 +402,8 @@ export default function Reports() {
       <div className="p-6 flex-1 overflow-y-auto">
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-            <TabsTrigger value="detailed">Detalhado</TabsTrigger>
+            <TabsTrigger value="overview">{t('reports.tabs.overview')}</TabsTrigger>
+            <TabsTrigger value="detailed">{t('reports.tabs.detailed')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -386,7 +413,7 @@ export default function Reports() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Receitas</p>
+                      <p className="text-sm font-medium text-gray-600">{t('reports.summary.income')}</p>
                       <p className="text-2xl font-bold text-green-600">
                         {formatCurrency(summary.totalIncome)}
                       </p>
@@ -403,7 +430,7 @@ export default function Reports() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Despesas</p>
+                      <p className="text-sm font-medium text-gray-600">{t('reports.summary.expenses')}</p>
                       <p className="text-2xl font-bold text-red-600">
                         {formatCurrency(summary.totalExpenses)}
                       </p>
@@ -420,7 +447,7 @@ export default function Reports() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Saldo</p>
+                      <p className="text-sm font-medium text-gray-600">{t('reports.summary.balance')}</p>
                       <p className={`text-2xl font-bold ${summary.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {formatCurrency(summary.balance)}
                       </p>
@@ -437,7 +464,7 @@ export default function Reports() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Progresso Metas</p>
+                      <p className="text-sm font-medium text-gray-600">{t('reports.summary.goalsProgress')}</p>
                       <p className="text-2xl font-bold text-blue-600">
                         {summary.goalsProgress.toFixed(1)}%
                       </p>
@@ -455,7 +482,7 @@ export default function Reports() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Despesas por Categoria</CardTitle>
+                  <CardTitle>{t('reports.charts.expensesByCategory')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-64">
@@ -463,7 +490,7 @@ export default function Reports() {
                       <Bar data={expensesChartData} options={chartOptions} />
                     ) : (
                       <div className="h-full flex items-center justify-center text-gray-500">
-                        Nenhuma despesa no período selecionado
+                        {t('reports.noExpensesInPeriod')}
                       </div>
                     )}
                   </div>
@@ -472,7 +499,7 @@ export default function Reports() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Receitas vs Despesas (6 meses)</CardTitle>
+                  <CardTitle>{t('reports.charts.incomeVsExpenses')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-64">
@@ -488,25 +515,25 @@ export default function Reports() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <FileText className="h-5 w-5 mr-2" />
-                  Transações Detalhadas - {getPeriodLabel(period)}
+                  {t('reports.detailedTransactions')} - {getPeriodLabel(period)}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {filteredTransactions.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
-                    Nenhuma transação encontrada no período selecionado
+                    {t('reports.noTransactionsInPeriod')}
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-gray-200">
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Data</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Descrição</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Categoria</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Tipo</th>
-                          <th className="text-right py-3 px-4 font-medium text-gray-600">Valor</th>
-                          <th className="text-center py-3 px-4 font-medium text-gray-600">Status</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-600">{t('reports.table.date')}</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-600">{t('reports.table.description')}</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-600">{t('reports.table.category')}</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-600">{t('reports.table.type')}</th>
+                          <th className="text-right py-3 px-4 font-medium text-gray-600">{t('reports.table.amount')}</th>
+                          <th className="text-center py-3 px-4 font-medium text-gray-600">{t('reports.table.status')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -528,10 +555,10 @@ export default function Reports() {
                                   {transaction.description}
                                 </td>
                                 <td className="py-3 px-4 text-sm text-gray-600">
-                                  {category?.name || 'Outros'}
+                                  {category?.name || t('common.others')}
                                 </td>
                                 <td className="py-3 px-4 text-sm text-gray-600">
-                                  {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+                                  {transaction.type === 'income' ? t('transactions.type.income') : t('transactions.type.expense')}
                                 </td>
                                 <td className={`py-3 px-4 text-sm text-right font-semibold ${amountColor}`}>
                                   {amountWithSign}
@@ -544,9 +571,9 @@ export default function Reports() {
                                       ? 'bg-orange-100 text-orange-800'
                                       : 'bg-red-100 text-red-800'
                                   }`}>
-                                    {transaction.status === 'paid' ? 'Pago' :
-                                     transaction.status === 'received' ? 'Recebido' :
-                                     transaction.status === 'pending' ? 'Pendente' : 'Vencido'}
+                                    {transaction.status === 'paid' ? t('transactions.status.paid') :
+                                     transaction.status === 'received' ? t('transactions.status.received') :
+                                     transaction.status === 'pending' ? t('transactions.status.pending') : t('transactions.status.overdue')}
                                   </span>
                                 </td>
                               </tr>

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/currency";
 import { Plus } from "lucide-react";
+import { api } from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 interface Goal {
   id: number;
@@ -15,8 +17,10 @@ interface Goal {
 }
 
 export default function GoalsProgress() {
+  const { t } = useTranslation();
   const { data: goals, isLoading } = useQuery<Goal[]>({
-    queryKey: ["/api/goals"],
+    queryKey: ["goals"],
+    queryFn: () => api("/api/goals"),
   });
 
   if (isLoading) {
@@ -24,7 +28,7 @@ export default function GoalsProgress() {
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader className="flex flex-row items-center justify-between pb-6">
           <CardTitle className="text-lg font-semibold text-gray-800">
-            Minhas Metas
+            {t('dashboard.goals')}
           </CardTitle>
           <Skeleton className="h-8 w-8" />
         </CardHeader>
@@ -53,11 +57,11 @@ export default function GoalsProgress() {
     return (
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader>
-          <CardTitle>Minhas Metas</CardTitle>
+          <CardTitle>{t('dashboard.goals')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
-            Erro ao carregar metas
+            {t('dashboard.errorLoadingGoals')}
           </div>
         </CardContent>
       </Card>
@@ -82,19 +86,19 @@ export default function GoalsProgress() {
     <Card className="bg-white shadow-sm border border-gray-200">
       <CardHeader className="flex flex-row items-center justify-between pb-6">
         <CardTitle className="text-lg font-semibold text-gray-800">
-          Minhas Metas
+          {t('dashboard.goals')}
         </CardTitle>
-        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-primary hover:text-primary/80">
+        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-primary hover:text-primary/80" title={t('goals.addValue')}>
           <Plus className="h-4 w-4" />
         </Button>
       </CardHeader>
       <CardContent>
         {goals.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p className="mb-4">Você ainda não tem metas definidas</p>
+            <p className="mb-4">{t('dashboard.noGoalsDefined')}</p>
             <Button size="sm" className="bg-primary hover:bg-primary/90">
               <Plus className="h-4 w-4 mr-2" />
-              Criar Meta
+              {t('dashboard.createGoal')}
             </Button>
           </div>
         ) : (
@@ -114,8 +118,8 @@ export default function GoalsProgress() {
                     className="w-full h-2 mb-1"
                   />
                   <div className="flex justify-between text-sm text-gray-500">
-                    <span>{formatCurrency(parseFloat(goal.currentAmount))}</span>
-                    <span>{formatCurrency(parseFloat(goal.targetAmount))}</span>
+                    <span>{t('goals.saved')}: {formatCurrency(parseFloat(goal.currentAmount))}</span>
+                    <span>{t('goals.target')}: {formatCurrency(parseFloat(goal.targetAmount))}</span>
                   </div>
                 </div>
               );
@@ -124,7 +128,7 @@ export default function GoalsProgress() {
             {goals.length > 3 && (
               <div className="text-center pt-4">
                 <Button variant="outline" size="sm">
-                  Ver todas as metas
+                  {t('dashboard.viewAllGoals')}
                 </Button>
               </div>
             )}

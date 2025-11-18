@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/currency";
 import { formatDateRelative } from "@/lib/date";
+import { api } from "@/lib/api";
+import { useTranslation } from "react-i18next";
 import { CreditCard, Home, Zap, Car, ShoppingCart } from "lucide-react";
 
 interface Transaction {
@@ -30,12 +32,15 @@ const iconMap: { [key: string]: any } = {
 };
 
 export default function UpcomingBills() {
+  const { t } = useTranslation();
   const { data: upcomingBills, isLoading: billsLoading } = useQuery<Transaction[]>({
-    queryKey: ["/api/transactions?upcoming=7"],
+    queryKey: ["transactions", "upcoming"],
+    queryFn: () => api("/api/transactions?upcoming=7"),
   });
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
-    queryKey: ["/api/categories"],
+    queryKey: ["categories"],
+    queryFn: () => api("/api/categories"),
   });
 
   const isLoading = billsLoading || categoriesLoading;
@@ -45,7 +50,7 @@ export default function UpcomingBills() {
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader className="flex flex-row items-center justify-between pb-6">
           <CardTitle className="text-lg font-semibold text-gray-800">
-            Próximas Contas
+            {t('dashboard.upcomingBills')}
           </CardTitle>
           <Skeleton className="h-4 w-16" />
         </CardHeader>
@@ -76,11 +81,11 @@ export default function UpcomingBills() {
     return (
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader>
-          <CardTitle>Próximas Contas</CardTitle>
+          <CardTitle>{t('dashboard.upcomingBills')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
-            Nenhuma conta próxima ao vencimento
+            {t('dashboard.noUpcomingBills')}
           </div>
         </CardContent>
       </Card>
@@ -103,11 +108,11 @@ export default function UpcomingBills() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'Pendente';
+        return t('transactions.status.pending');
       case 'paid':
-        return 'Pago';
+        return t('transactions.status.paid');
       case 'overdue':
-        return 'Vencido';
+        return t('transactions.status.overdue');
       default:
         return status;
     }
@@ -135,16 +140,16 @@ export default function UpcomingBills() {
     <Card className="bg-white shadow-sm border border-gray-200">
       <CardHeader className="flex flex-row items-center justify-between pb-6">
         <CardTitle className="text-lg font-semibold text-gray-800">
-          Próximas Contas
+          {t('dashboard.upcomingBills')}
         </CardTitle>
         <a href="/expenses" className="text-primary text-sm font-medium hover:text-primary/80">
-          Ver todas
+          {t('dashboard.viewAll')}
         </a>
       </CardHeader>
       <CardContent>
         {upcomingBills.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            Nenhuma conta próxima ao vencimento
+            {t('dashboard.noUpcomingBills')}
           </div>
         ) : (
           <div className="space-y-4">
@@ -161,7 +166,7 @@ export default function UpcomingBills() {
                     <div>
                       <p className="font-medium text-gray-900">{bill.description}</p>
                       <p className="text-sm text-gray-500">
-                        {bill.dueDate ? formatDateRelative(bill.dueDate) : 'Data não definida'}
+                        {bill.dueDate ? formatDateRelative(bill.dueDate) : t('transactions.dateNotDefined')}
                       </p>
                     </div>
                   </div>
