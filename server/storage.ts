@@ -102,8 +102,6 @@ class DatabaseStorage implements IAppStorage {
 
   async getDefaultCategories(): Promise<Category[]> {
     const DEMO_USER_ID = 1;
-    const existing = await db.select().from(categories).where(eq(categories.userId, DEMO_USER_ID));
-
     // Fallback em memória com um conjunto mínimo garantido (inclui pelo menos 1 de renda e diversas de despesa)
     const now = new Date();
     const fallback: Category[] = [
@@ -134,19 +132,8 @@ class DatabaseStorage implements IAppStorage {
       { id: 0, userId: DEMO_USER_ID, name: 'Impostos e Taxas', type: 'expense', icon: 'percent', color: '#d35400', createdAt: now, updatedAt: now },
       { id: 0, userId: DEMO_USER_ID, name: 'Outras Despesas', type: 'expense', icon: 'dots', color: '#95a5a6', createdAt: now, updatedAt: now },
     ];
-    // Se já existirem categorias no usuário DEMO, garantimos que exista ao menos 1 de renda e 1 de despesa.
-    if (existing && existing.length > 0) {
-      const hasIncome = existing.some((c) => c.type === 'income');
-      const hasExpense = existing.some((c) => c.type === 'expense');
-      if (hasIncome && hasExpense) {
-        return existing;
-      }
-      // Complementa com o que estiver faltando a partir do fallback em memória
-      const additions = fallback.filter((c) => (c.type === 'income' && !hasIncome) || (c.type === 'expense' && !hasExpense));
-      return [...existing, ...additions];
-    }
 
-    // Caso não haja nada no usuário DEMO, retorna o fallback completo
+    // Retorna sempre o conjunto padrão em memória, evitando consultas inválidas
     return fallback;
   }
 
