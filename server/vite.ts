@@ -117,7 +117,7 @@ export function serveStatic() {
   router.use(express.static(distPath));
 
   // Fallback to index.html for SPA routing
-  router.get('/*', (_req, res) => {
+  router.get(/.*/, (_req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 
