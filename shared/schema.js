@@ -92,11 +92,22 @@ export const investments = mysqlTable("investments", {
 }));
 export const alerts = mysqlTable("alerts", {
     id: int("id").primaryKey().autoincrement(),
+    userId: int("user_id").notNull(),
     type: text("type").notNull(), // 'bill_due', 'goal_achieved', 'unusual_spending'
     message: text("message").notNull(),
     isRead: boolean("is_read").default(false).notNull(),
     referenceId: int("reference_id"),
     referenceType: text("reference_type"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
+});
+export const userPreferences = mysqlTable("user_preferences", {
+    id: int("id").primaryKey().autoincrement(),
+    userId: int("user_id").notNull(),
+    language: text("language").default("pt-BR").notNull(),
+    theme: text("theme").default("light").notNull(),
+    currency: text("currency").default("BRL").notNull(),
+    dateFormat: text("date_format").default("DD/MM/YYYY").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
 });
@@ -121,4 +132,11 @@ export const insertTransactionSchema = createInsertSchema(transactions, {
 }).omit({ id: true, createdAt: true, updatedAt: true });
 export const updateTransactionSchema = insertTransactionSchema.partial();
 export const insertAlertSchema = createInsertSchema(alerts).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences, {
+    language: z.enum(["pt-BR", "en-US", "es"]).default("pt-BR"),
+    theme: z.enum(["light", "dark", "system"]).default("light"),
+    currency: z.enum(["BRL", "USD", "EUR"]).default("BRL"),
+    dateFormat: z.enum(["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"]).default("DD/MM/YYYY"),
+}).omit({ id: true, createdAt: true, updatedAt: true });
+export const updateUserPreferencesSchema = insertUserPreferencesSchema.partial();
 // For other updates, you might use Partial<ValidatedInsertType> if a specific update schema doesn't exist
