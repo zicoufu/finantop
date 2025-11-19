@@ -146,8 +146,15 @@ export default function LoginPage() {
               variant="outline"
               className="w-full"
               onClick={() => {
-                const baseEnv = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined;
-                const cleanedBase = baseEnv ? baseEnv.replace(/\/+$/, '') : '';
+                const envBase = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined;
+                let cleanedBase = envBase ? envBase.replace(/\/+$/, '') : '';
+                if (!cleanedBase || /localhost(:\d+)?$/i.test(cleanedBase)) {
+                  if (typeof window !== 'undefined' && window.location?.origin) {
+                    cleanedBase = window.location.origin.replace(/\/+$/, '');
+                  } else {
+                    cleanedBase = '';
+                  }
+                }
                 const url = `${cleanedBase}/api/auth/google`;
                 window.location.href = url;
               }}

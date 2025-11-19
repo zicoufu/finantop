@@ -16,9 +16,21 @@ export class ApiError extends Error {
 export const api = async (url: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('authToken');
 
-  // Base URL (workaround sem proxy do Vite). Se não houver, usa caminho relativo.
-  const baseEnv = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined;
-  const cleanedBase = baseEnv ? baseEnv.replace(/\/+$/, '') : '';
+  // Base URL (workaround sem proxy do Vite).
+  // Regra:
+  //  - Se VITE_API_BASE_URL for vazio ou apontar para localhost, usa window.location.origin (mesma origem).
+  //  - Caso contrário, usa VITE_API_BASE_URL.
+  const envBase = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined;
+  let cleanedBase = envBase ? envBase.replace(/\/+$/, '') : '';
+
+  if (!cleanedBase || /localhost(:\d+)?$/i.test(cleanedBase)) {
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      cleanedBase = window.location.origin.replace(/\/+$/, '');
+    } else {
+      cleanedBase = '';
+    }
+  }
+
   const cleanedPath = (url.startsWith('/') ? url : `/${url}`).replace(/\/{2,}/g, '/');
   const apiUrl = cleanedBase ? `${cleanedBase}${cleanedPath}` : cleanedPath;
   
