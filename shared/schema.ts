@@ -1,13 +1,13 @@
-import { mysqlTable, text, int, boolean, timestamp, decimal, date, datetime } from "drizzle-orm/mysql-core";
+import { mysqlTable, text, varchar, int, boolean, timestamp, decimal, date, datetime } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = mysqlTable("users", {
   id: int("id").primaryKey().autoincrement(),
-  username: text("username").notNull().unique(),
+  username: varchar("username", { length: 191 }).notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
-  email: text("email").notNull().unique(),
+  email: varchar("email", { length: 191 }).notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
