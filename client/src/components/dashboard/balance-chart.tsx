@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MoreVertical, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { api } from "@/lib/api";
 import { formatCurrency } from "@/lib/currency";
 import { useTranslation } from "react-i18next";
@@ -60,7 +60,6 @@ export default function BalanceChart() {
           <CardTitle className="text-lg font-semibold text-gray-800">
             {t('dashboard.balanceEvolution')}
           </CardTitle>
-          <MoreVertical className="h-4 w-4 text-gray-400" />
         </CardHeader>
         <CardContent>
           <div className="h-64 flex items-center justify-center">
@@ -268,9 +267,6 @@ export default function BalanceChart() {
         <CardTitle className="text-lg font-semibold text-gray-800">
           {t('dashboard.balanceEvolution')}
         </CardTitle>
-        <button className="text-gray-400 hover:text-gray-600" aria-label={t('dashboard.charts.balanceOptions')}>
-          <MoreVertical className="h-4 w-4" />
-        </button>
       </CardHeader>
       <CardContent>
         <div className="h-64">
