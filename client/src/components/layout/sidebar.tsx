@@ -40,7 +40,7 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        "bg-white dark:bg-gray-900 shadow-lg border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out flex flex-col",
+        "bg-white dark:bg-gray-900 shadow-lg border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out flex flex-col h-screen overflow-y-auto",
         isCollapsed ? "w-16" : "w-64"
       )}
     >
@@ -65,7 +65,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="px-4 pb-4 flex-1">
+      <nav className="px-4 pb-4 flex-1 overflow-y-auto">
         <ul className="space-y-2">
           {getNavigation(t).map((item: { name: string; href: string; icon: React.ElementType }) => {
             const Icon = item.icon;
