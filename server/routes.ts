@@ -34,65 +34,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return done(new Error('Email não disponível pelo Google'), undefined);
         }
 
-  // =================================================================
-  // ACCOUNTS ROUTES (BANK / CREDIT CARD)
-  // =================================================================
-
-  app.get("/api/accounts", protect, async (req, res) => {
-    try {
-      const userId = getUserIdFromRequest(req);
-      const accounts = await storage.getAccounts(userId);
-      return res.json(accounts);
-    } catch (error) {
-      const err = error as Error;
-      console.error("[GET /api/accounts] Error:", err.message, err.stack);
-      return res.status(500).json({ message: "Failed to fetch accounts" });
-    }
-  });
-
-  app.post("/api/accounts", protect, async (req, res) => {
-    console.log("[POST /api/accounts] Início da requisição");
-    try {
-      const userId = getUserIdFromRequest(req);
-      const validatedData = insertAccountSchema.parse({
-        ...req.body,
-        userId,
-      });
-
-      const account = await storage.createAccount(validatedData as any);
-      console.log("[POST /api/accounts] Conta criada com sucesso", account.id);
-      return res.status(201).json(account);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        console.error("[POST /api/accounts] Erro de validação:", JSON.stringify(error.errors, null, 2));
-        return res.status(400).json({ message: "Invalid data", errors: error.errors });
-      }
-      const err = error as Error;
-      console.error("[POST /api/accounts] Erro ao criar conta:", err.message, err.stack);
-      return res.status(500).json({ message: "Failed to create account" });
-    }
-  });
-
-  app.delete("/api/accounts/:id", protect, async (req, res) => {
-    console.log(`[DELETE /api/accounts/${req.params.id}] Início da requisição`);
-    try {
-      const id = parseInt(req.params.id, 10);
-      if (Number.isNaN(id)) {
-        return res.status(400).json({ message: "Invalid account ID" });
-      }
-
-      const success = await storage.deleteAccount(id);
-      if (!success) {
-        return res.status(404).json({ message: "Account not found" });
-      }
-
-      return res.json({ success: true });
-    } catch (error) {
-      const err = error as Error;
-      console.error("[DELETE /api/accounts/:id] Erro ao remover conta:", err.message, err.stack);
-      return res.status(500).json({ message: "Failed to delete account" });
-    }
-  });
         let user = await storage.getUserByEmail(email);
         if (!user) {
           const usernameBase = email.split('@')[0]?.replace(/[^a-zA-Z0-9_\-\.]/g, '') || `google_${googleId}`;
@@ -199,6 +140,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log(`[getUserIdFromRequest] No authenticated user, using demo ID: ${DEMO_USER_ID}`);
     return DEMO_USER_ID;
   }
+
+  // =================================================================
+  // ACCOUNTS ROUTES (BANK / CREDIT CARD)
+  // =================================================================
+
+  app.get("/api/accounts", protect, async (req, res) => {
+    try {
+      const userId = getUserIdFromRequest(req);
+      const accounts = await storage.getAccounts(userId);
+      return res.json(accounts);
+    } catch (error) {
+      const err = error as Error;
+      console.error("[GET /api/accounts] Error:", err.message, err.stack);
+      return res.status(500).json({ message: "Failed to fetch accounts" });
+    }
+  });
+
+  app.post("/api/accounts", protect, async (req, res) => {
+    console.log("[POST /api/accounts] Início da requisição");
+    try {
+      const userId = getUserIdFromRequest(req);
+      const validatedData = insertAccountSchema.parse({
+        ...req.body,
+        userId,
+      });
+
+      const account = await storage.createAccount(validatedData as any);
+      console.log("[POST /api/accounts] Conta criada com sucesso", account.id);
+      return res.status(201).json(account);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error("[POST /api/accounts] Erro de validação:", JSON.stringify(error.errors, null, 2));
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      const err = error as Error;
+      console.error("[POST /api/accounts] Erro ao criar conta:", err.message, err.stack);
+      return res.status(500).json({ message: "Failed to create account" });
+    }
+  });
+
+  app.delete("/api/accounts/:id", protect, async (req, res) => {
+    console.log(`[DELETE /api/accounts/${req.params.id}] Início da requisição`);
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ message: "Invalid account ID" });
+      }
+
+      const success = await storage.deleteAccount(id);
+      if (!success) {
+        return res.status(404).json({ message: "Account not found" });
+      }
+
+      return res.json({ success: true });
+    } catch (error) {
+      const err = error as Error;
+      console.error("[DELETE /api/accounts/:id] Erro ao remover conta:", err.message, err.stack);
+      return res.status(500).json({ message: "Failed to delete account" });
+    }
+  });
 
   // =================================================================
   // AUTHENTICATION ROUTES
