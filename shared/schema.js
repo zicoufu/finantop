@@ -10,6 +10,29 @@ export const users = mysqlTable("users", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
+
+// Accounts table (contas bancárias / cartões de crédito)
+export const accounts = mysqlTable("accounts", {
+    id: int("id").primaryKey().autoincrement(),
+    userId: int("user_id").notNull(),
+    name: text("name").notNull(),
+    // 'bank' | 'credit_card'
+    type: text("type").notNull(),
+    // Saldo atual da conta
+    balance: decimal("balance", { precision: 10, scale: 2 }).default("0.00").notNull(),
+    // Campos opcionais para cartão de crédito
+    creditLimit: decimal("credit_limit", { precision: 10, scale: 2 }).default("0.00"),
+    closingDay: int("closing_day"),
+    dueDay: int("due_day"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
+}, (table) => ({
+    userReference: foreignKey({
+        columns: [table.userId],
+        foreignColumns: [users.id],
+        name: "accounts_user_id_fk",
+    }),
+}));
 export const categories = mysqlTable("categories", {
     id: int("id").primaryKey().autoincrement(),
     name: text("name").notNull(),
@@ -124,6 +147,8 @@ export const insertInvestmentSchema = createInsertSchema(investments, {
     maturityDate: z.coerce.date().optional().nullable(), // Garante a conversão e mantém opcional
 }).omit({ id: true, createdAt: true, updatedAt: true });
 export const updateInvestmentSchema = insertInvestmentSchema.partial();
+// Accounts: esquema simples (números serão normalizados na camada de serviço)
+export const insertAccountSchema = createInsertSchema(accounts).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertTransactionSchema = createInsertSchema(transactions, {
     date: z.coerce.date(),
     dueDate: z.coerce.date().optional().nullable(),
