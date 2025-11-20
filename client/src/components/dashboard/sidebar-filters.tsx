@@ -1,8 +1,22 @@
+import { useQuery } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
+import { api } from "@/lib/api";
+import { formatCurrency } from "@/lib/currency";
+
+interface Account {
+  id: number;
+  name: string;
+  type: string;
+  balance: string | number;
+}
 
 export default function SidebarFilters() {
+  const { data: accounts, isLoading: isLoadingAccounts } = useQuery<Account[]>({
+    queryKey: ["accounts"],
+    queryFn: () => api("/api/accounts"),
+  });
   return (
     <aside className="w-80 flex-shrink-0 bg-white dark:bg-gray-900 p-6 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto">
       <div className="flex items-center p-3 bg-gray-100 dark:bg-gray-800 rounded-lg mb-6" />
@@ -25,29 +39,33 @@ export default function SidebarFilters() {
             <span>Contas</span>
             <span>Saldo</span>
           </div>
-          <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
-            <li className="flex justify-between items-center">
-              <span>CAIXADXA</span>
-              <div className="flex items-center space-x-2">
-                <span>R$ 6.616</span>
-                <span className="w-3 h-3 bg-green-500 rounded-full" />
-              </div>
-            </li>
-            <li className="flex justify-between items-center">
-              <span>BUBANK</span>
-              <div className="flex items-center space-x-2">
-                <span>-R$ 900</span>
-                <span className="w-3 h-3 bg-red-500 rounded-full" />
-              </div>
-            </li>
-            <li className="flex justify-between items-center">
-              <span>WISA</span>
-              <div className="flex items-center space-x-2">
-                <span>-R$ 1.500</span>
-                <span className="w-3 h-3 bg-red-500 rounded-full" />
-              </div>
-            </li>
-          </ul>
+          {isLoadingAccounts ? (
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Carregando contas...
+            </div>
+          ) : !accounts || accounts.length === 0 ? (
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Nenhuma conta cadastrada ainda.
+            </div>
+          ) : (
+            <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+              {accounts.map((account) => {
+                const numericBalance = typeof account.balance === "string" ? Number(account.balance) : account.balance;
+                const isPositive = numericBalance >= 0;
+                return (
+                  <li key={account.id} className="flex justify-between items-center">
+                    <span>{account.name}</span>
+                    <div className="flex items-center space-x-2">
+                      <span>{formatCurrency(numericBalance)}</span>
+                      <span
+                        className={`w-3 h-3 rounded-full ${isPositive ? "bg-green-500" : "bg-red-500"}`}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
 
         <div>
