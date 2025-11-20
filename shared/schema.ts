@@ -12,6 +12,28 @@ export const users = mysqlTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
+export const accounts = mysqlTable("accounts", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").notNull(),
+  name: text("name").notNull(),
+  // 'bank' | 'credit_card'
+  type: text("type").notNull(),
+  // Saldo atual da conta (para cartão pode ser usado como saldo da fatura atual)
+  balance: decimal("balance", { precision: 10, scale: 2 }).default("0.00").notNull(),
+  // Campos opcionais específicos para cartão de crédito
+  creditLimit: decimal("credit_limit", { precision: 10, scale: 2 }).default("0.00"),
+  closingDay: int("closing_day"),
+  dueDay: int("due_day"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
+}, (table) => ({
+  userReference: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+    name: "accounts_user_id_fk",
+  }),
+}));
+
 export const categories = mysqlTable("categories", {
   id: int("id").primaryKey().autoincrement(),
   name: text("name").notNull(),
@@ -185,6 +207,9 @@ export const insertInvestmentSchema = createInsertSchema(investments, {
 
 export const updateInvestmentSchema = insertInvestmentSchema.partial();
 
+// Accounts: permitir receber saldo/limite como string e converter depois na camada de storage/serviço
+export const insertAccountSchema = createInsertSchema(accounts).omit({ id: true, createdAt: true, updatedAt: true });
+
 export const insertTransactionSchema = createInsertSchema(transactions, {
   date: z.coerce.date(),
   dueDate: z.coerce.date().optional().nullable(),
@@ -224,6 +249,9 @@ export type InsertInvestment = typeof investments.$inferInsert;
 export type Alert = typeof alerts.$inferSelect;
 export type InsertAlert = typeof alerts.$inferInsert;
 
+export type Account = typeof accounts.$inferSelect;
+export type InsertAccount = typeof accounts.$inferInsert;
+
 export type UserPreference = typeof userPreferences.$inferSelect;
 export type InsertUserPreference = typeof userPreferences.$inferInsert;
 
@@ -234,6 +262,7 @@ export type ValidatedInsertTransaction = z.infer<typeof insertTransactionSchema>
 export type ValidatedInsertGoal = z.infer<typeof insertGoalSchema>;
 export type ValidatedInsertInvestment = z.infer<typeof insertInvestmentSchema>;
 export type ValidatedInsertAlert = z.infer<typeof insertAlertSchema>;
+export type ValidatedInsertAccount = z.infer<typeof insertAccountSchema>;
 export type ValidatedInsertUserPreference = z.infer<typeof insertUserPreferencesSchema>;
 export type ValidatedUpdateUserPreference = z.infer<typeof updateUserPreferencesSchema>;
 

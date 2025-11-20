@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
-import { insertUserSchema, insertTransactionSchema, updateTransactionSchema, insertGoalSchema, insertInvestmentSchema, updateInvestmentSchema, insertCategorySchema, insertAlertSchema, insertUserPreferencesSchema, updateUserPreferencesSchema } from "../shared/schema.js";
+import { insertUserSchema, insertTransactionSchema, updateTransactionSchema, insertGoalSchema, insertInvestmentSchema, updateInvestmentSchema, insertCategorySchema, insertAlertSchema, insertUserPreferencesSchema, updateUserPreferencesSchema, insertAccountSchema } from "../shared/schema.js";
 import { z } from "zod";
 import { hashPassword, comparePassword, createJWT, protect } from "./auth.js";
 import passport from "passport";
@@ -61,6 +61,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             return newUser;
           });
+
+  // =================================================================
+  // ACCOUNTS ROUTES (BANK / CREDIT CARD)
+  // =================================================================
+
+  app.get("/api/accounts", protect, async (req, res) => {
+    try {
+      const userId = getUserIdFromRequest(req);
+      const accounts = await storage.getAccounts(userId);
+      return res.json(accounts);
+    } catch (error) {
+      const err = error as Error;
+      console.error("[GET /api/accounts] Error:", err.message, err.stack);
+      return res.status(500).json({ message: "Failed to fetch accounts" });
+    }
+  });
+
+  app.post("/api/accounts", protect, async (req, res) => {
+    console.log("[POST /api/accounts] Início da requisição");
+    try {
+      const userId = getUserIdFromRequest(req);
+      const validatedData = insertAccountSchema.parse({
+        ...req.body,
+        userId,
+      });
+
+      const account = await storage.createAccount(validatedData as any);
+      console.log("[POST /api/accounts] Conta criada com sucesso", account.id);
+      return res.status(201).json(account);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error("[POST /api/accounts] Erro de validação:", JSON.stringify(error.errors, null, 2));
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      const err = error as Error;
+      console.error("[POST /api/accounts] Erro ao criar conta:", err.message, err.stack);
+      return res.status(500).json({ message: "Failed to create account" });
+    }
+  });
         }
         return done(null, user);
       } catch (err) {
@@ -221,41 +260,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
             throw err;
           }
-          console.log(`[POST /api/auth/register] Preferências criadas.`);
+          console.log("[POST /api/auth/register] Preferências criadas.");
 
-          // 2. Criar categorias padrão para o novo usuário
-          console.log(`[POST /api/auth/register] Criando categorias padrão para o usuário ${newUserId}...`);
-          const defaultCategories = await storage.getDefaultCategories(); 
-          if (defaultCategories.length > 0) {
-            const userCategories = defaultCategories.map(cat => ({
-              ...cat,
-              userId: newUserId, // Associar ao novo usuário
-              id: undefined, // Deixar o banco gerar novo ID
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            }));
-            try {
-              await storage.createManyCategories(userCategories, tx);
-            } catch (err: any) {
-              console.error('[POST /api/auth/register] Falha em createManyCategories', {
-                step: 'createManyCategories',
-                code: err?.code,
-                errno: err?.errno,
-                sqlState: err?.sqlState,
-                sqlMessage: err?.sqlMessage,
-                sql: err?.sql,
-                message: err?.message,
-                stack: err?.stack,
-                samplePayload: userCategories?.[0] ? { ...userCategories[0], sqlOmitted: true } : undefined,
-                payloadLength: userCategories.length,
-              });
-              throw err;
-            }
-            console.log(`[POST /api/auth/register] ${userCategories.length} categorias padrão criadas.`);
-          } else {
-            console.warn('[POST /api/auth/register] Nenhuma categoria padrão encontrada para copiar.');
-          }
-          
+          // 2. (Temporariamente desativado) Criar categorias padrão para o novo usuário.
+          // Problemas de schema entre categorias e user_id em produção estão causando erros SQL,
+          // então, por enquanto, vamos apenas criar usuário + preferências.
+          // O usuário poderá criar categorias manualmente pelo app.
+
           return user;
         });
       } catch (dbErr: any) {

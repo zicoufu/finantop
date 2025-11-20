@@ -1,12 +1,28 @@
 import { 
-  users, categories, transactions, goals, investments, alerts, userPreferences,
-  type User, type InsertUser,
-  type Category, type InsertCategory,
-  type Transaction, type InsertTransaction,
-  type Goal, type InsertGoal,
-  type Investment, type InsertInvestment,
-  type Alert, type InsertAlert,
-  type UserPreference, type InsertUserPreference,
+  users,
+  categories,
+  transactions,
+  goals,
+  investments,
+  alerts,
+  userPreferences,
+  accounts,
+  type User,
+  type InsertUser,
+  type Category,
+  type InsertCategory,
+  type Transaction,
+  type InsertTransaction,
+  type Goal,
+  type InsertGoal,
+  type Investment,
+  type InsertInvestment,
+  type Alert,
+  type InsertAlert,
+  type UserPreference,
+  type InsertUserPreference,
+  type Account,
+  type InsertAccount,
 } from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, and, desc, asc, gte, lte } from "drizzle-orm";
@@ -55,6 +71,8 @@ export interface IAppStorage {
   createOrUpdateUserPreferences(userId: number, preferences: Partial<InsertUserPreference>): Promise<UserPreference>;
   getCategoriesByType(userId: number, type: string): Promise<Category[]>;
   initializeSampleData(): Promise<{ success: boolean; userId?: number; message?: string }>;
+  getAccounts(userId: number): Promise<Account[]>;
+  createAccount(account: InsertAccount): Promise<Account>;
 }
 
 class DatabaseStorage implements IAppStorage {
@@ -162,6 +180,31 @@ class DatabaseStorage implements IAppStorage {
   async deleteCategory(id: number): Promise<boolean> {
     await db.delete(categories).where(eq(categories.id, id));
     return true;
+  }
+
+  async getAccounts(userId: number): Promise<Account[]> {
+    return db.select().from(accounts).where(eq(accounts.userId, userId)).orderBy(desc(accounts.id));
+  }
+
+  async createAccount(account: InsertAccount): Promise<Account> {
+    const now = new Date();
+    const normalized: InsertAccount & { createdAt: Date; updatedAt: Date } = {
+      ...account,
+      createdAt: now,
+      updatedAt: now,
+    } as any;
+
+    const result = await db.insert(accounts).values(normalized);
+    const [newAccount] = await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.id, result[0].insertId));
+
+    if (!newAccount) {
+      throw new Error("Failed to create account");
+    }
+
+    return newAccount;
   }
 
   async getTransactions(userId: number): Promise<Transaction[]> {
