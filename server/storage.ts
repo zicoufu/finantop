@@ -73,6 +73,7 @@ export interface IAppStorage {
   initializeSampleData(): Promise<{ success: boolean; userId?: number; message?: string }>;
   getAccounts(userId: number): Promise<Account[]>;
   createAccount(account: InsertAccount): Promise<Account>;
+  deleteAccount(id: number): Promise<boolean>;
 }
 
 class DatabaseStorage implements IAppStorage {
@@ -205,6 +206,11 @@ class DatabaseStorage implements IAppStorage {
     }
 
     return newAccount;
+  }
+
+  async deleteAccount(id: number): Promise<boolean> {
+    await db.delete(accounts).where(eq(accounts.id, id));
+    return true;
   }
 
   async getTransactions(userId: number): Promise<Transaction[]> {

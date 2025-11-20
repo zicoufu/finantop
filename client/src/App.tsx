@@ -19,6 +19,7 @@ import Goals from "@/pages/goals";
 import Alerts from "@/pages/alerts";
 import Reports from "@/pages/reports";
 import UserPreferences from "@/pages/user-preferences";
+import AccountsPage from "@/pages/accounts";
 import Sidebar from "@/components/layout/sidebar";
 import LoginPage from "@/pages/login";
 import RegisterPage from "@/pages/register";
@@ -97,6 +98,7 @@ function App() {
                   <Route path="/goals" element={<Goals />} />
                   <Route path="/alerts" element={<Alerts />} />
                   <Route path="/reports" element={<Reports />} />
+                  <Route path="/accounts" element={<AccountsPage />} />
                   <Route path="/preferences" element={<UserPreferences />} />
                   {/** initialize-data removed */}
                 </Route>
@@ -125,6 +127,7 @@ function App() {
                   <Route path="/goals" element={<Goals />} />
                   <Route path="/alerts" element={<Alerts />} />
                   <Route path="/reports" element={<Reports />} />
+                  <Route path="/accounts" element={<AccountsPage />} />
                   <Route path="/preferences" element={<UserPreferences />} />
                   {/** initialize-data removed */}
                 </Route>

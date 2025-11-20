@@ -24,6 +24,7 @@ const getNavigation = (t: any) => [
   { name: t('sidebar.dashboard'), href: "/dashboard", icon: LayoutDashboard },
   { name: t('sidebar.expenses'), href: "/expenses", icon: CreditCard },
   { name: t('sidebar.income'), href: "/income", icon: Coins },
+  { name: t('sidebar.accounts') || 'Contas', href: "/accounts", icon: CreditCard },
   { name: t('sidebar.investments'), href: "/investments", icon: TrendingUp },
   { name: t('sidebar.goals'), href: "/goals", icon: Target },
   { name: t('sidebar.alerts'), href: "/alerts", icon: Bell },

@@ -100,6 +100,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ message: "Failed to create account" });
     }
   });
+
+  app.delete("/api/accounts/:id", protect, async (req, res) => {
+    console.log(`[DELETE /api/accounts/${req.params.id}] Início da requisição`);
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ message: "Invalid account ID" });
+      }
+
+      const success = await storage.deleteAccount(id);
+      if (!success) {
+        return res.status(404).json({ message: "Account not found" });
+      }
+
+      return res.json({ success: true });
+    } catch (error) {
+      const err = error as Error;
+      console.error("[DELETE /api/accounts/:id] Erro ao remover conta:", err.message, err.stack);
+      return res.status(500).json({ message: "Failed to delete account" });
+    }
+  });
         }
         return done(null, user);
       } catch (err) {
