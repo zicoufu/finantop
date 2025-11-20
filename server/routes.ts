@@ -33,34 +33,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!email) {
           return done(new Error('Email não disponível pelo Google'), undefined);
         }
-        let user = await storage.getUserByEmail(email);
-        if (!user) {
-          const usernameBase = email.split('@')[0]?.replace(/[^a-zA-Z0-9_\-\.]/g, '') || `google_${googleId}`;
-          const username = usernameBase.length > 2 ? usernameBase : `google_${googleId}`;
-          const randomPassword = `google_${googleId}_${Date.now()}`;
-          const hashedPassword = await hashPassword(randomPassword);
-          // Criar usuário + preferências + categorias padrão similar ao cadastro
-          user = await storage.runInTransaction(async (tx) => {
-            const newUser = await storage.createUser({
-              email,
-              name,
-              username,
-              password: hashedPassword,
-            }, tx);
-            await storage.createUserPreferences({ userId: newUser.id }, tx);
-            const defaultCategories = await storage.getDefaultCategories();
-            if (defaultCategories.length > 0) {
-              const userCategories = defaultCategories.map(cat => ({
-                ...cat,
-                userId: newUser.id,
-                id: undefined as any,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              }));
-              await storage.createManyCategories(userCategories, tx);
-            }
-            return newUser;
-          });
 
   // =================================================================
   // ACCOUNTS ROUTES (BANK / CREDIT CARD)
@@ -121,13 +93,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ message: "Failed to delete account" });
     }
   });
+        let user = await storage.getUserByEmail(email);
+        if (!user) {
+          const usernameBase = email.split('@')[0]?.replace(/[^a-zA-Z0-9_\-\.]/g, '') || `google_${googleId}`;
+          const username = usernameBase.length > 2 ? usernameBase : `google_${googleId}`;
+          const randomPassword = `google_${googleId}_${Date.now()}`;
+          const hashedPassword = await hashPassword(randomPassword);
+          // Criar usuário + preferências + categorias padrão similar ao cadastro
+          user = await storage.runInTransaction(async (tx) => {
+            const newUser = await storage.createUser({
+              email,
+              name,
+              username,
+              password: hashedPassword,
+            }, tx);
+            await storage.createUserPreferences({ userId: newUser.id }, tx);
+            const defaultCategories = await storage.getDefaultCategories();
+            if (defaultCategories.length > 0) {
+              const userCategories = defaultCategories.map(cat => ({
+                ...cat,
+                userId: newUser.id,
+                id: undefined as any,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              }));
+              await storage.createManyCategories(userCategories, tx);
+            }
+            return newUser;
+          });
         }
         return done(null, user);
       } catch (err) {
         return done(err as any, undefined);
       }
     }));
-
+  
     // Rota para iniciar OAuth
     app.get('/api/auth/google', passport.authenticate('google', {
       scope: ['profile', 'email'],
