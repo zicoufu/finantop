@@ -147,8 +147,11 @@ export const insertInvestmentSchema = createInsertSchema(investments, {
     maturityDate: z.coerce.date().optional().nullable(), // Garante a conversão e mantém opcional
 }).omit({ id: true, createdAt: true, updatedAt: true });
 export const updateInvestmentSchema = insertInvestmentSchema.partial();
-// Accounts: esquema simples (números serão normalizados na camada de serviço)
-export const insertAccountSchema = createInsertSchema(accounts).omit({ id: true, createdAt: true, updatedAt: true });
+// Accounts: permitir receber saldo/limite como número (ou string) e normalizar aqui
+export const insertAccountSchema = createInsertSchema(accounts, {
+    balance: z.coerce.number().min(0),
+    creditLimit: z.coerce.number().min(0).optional(),
+}).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertTransactionSchema = createInsertSchema(transactions, {
     date: z.coerce.date(),
     dueDate: z.coerce.date().optional().nullable(),
