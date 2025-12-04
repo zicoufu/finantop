@@ -48,36 +48,9 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
         </div>
 
         <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="flex items-center text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">
+          <div className="flex items-center text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">
             <span>Contas bancárias</span>
           </div>
-          {isLoadingAccounts ? (
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Carregando contas...
-            </div>
-          ) : !accounts || accounts.length === 0 ? (
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Nenhuma conta cadastrada ainda.
-            </div>
-          ) : (
-            <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
-              {accounts.map((account) => {
-                const numericBalance = typeof account.balance === "string" ? Number(account.balance) : account.balance;
-                const isPositive = numericBalance >= 0;
-                return (
-                  <li key={account.id} className="flex justify-between items-center">
-                    <span>{account.name}</span>
-                    <div className="flex items-center space-x-2">
-                      <span>{formatCurrency(numericBalance)}</span>
-                      <span
-                        className={`w-3 h-3 rounded-full ${isPositive ? "bg-green-500" : "bg-red-500"}`}
-                      />
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
         </div>
 
         <div>
