@@ -39,9 +39,16 @@ export const categories = mysqlTable("categories", {
     type: text("type").notNull(), // 'expense' or 'income'
     color: text("color").notNull(),
     icon: text("icon").notNull(),
+    userId: int("user_id").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").onUpdateNow().notNull(),
-});
+}, (table) => ({
+    userReference: foreignKey({
+        columns: [table.userId],
+        foreignColumns: [users.id],
+        name: 'categories_user_id_fk',
+    })
+}));
 export const transactions = mysqlTable("transactions", {
     id: int("id").primaryKey().autoincrement(),
     description: text("description").notNull(),
