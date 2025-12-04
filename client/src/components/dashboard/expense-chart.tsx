@@ -34,7 +34,18 @@ interface ChartData {
   hasData: boolean;
 }
 
-export default function ExpenseChart() {
+interface DashboardFilters {
+  startDate: string;
+  endDate: string;
+  year: string;
+  month: string;
+}
+
+interface ExpenseChartProps {
+  filters: DashboardFilters;
+}
+
+export default function ExpenseChart({ filters }: ExpenseChartProps) {
   const { t } = useTranslation();
   const { data: chartData, isLoading, isError } = useQuery<ChartData>({
     queryKey: ["reports", "charts"],
@@ -89,7 +100,7 @@ export default function ExpenseChart() {
     );
   }
   
-  // Use formatted data from the API
+  // Use formatted data from the API and apply simple year/month filtering if needed in the future
   const expensesByCategory = chartData.expensesByCategory;
 
   // Translate category names

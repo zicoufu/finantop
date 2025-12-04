@@ -46,7 +46,18 @@ interface ChartData {
   hasData: boolean;
 }
 
-export default function BalanceChart() {
+interface DashboardFilters {
+  startDate: string;
+  endDate: string;
+  year: string;
+  month: string;
+}
+
+interface BalanceChartProps {
+  filters: DashboardFilters;
+}
+
+export default function BalanceChart({ filters }: BalanceChartProps) {
   const { t } = useTranslation();
   const { data: chartData, isLoading, isError } = useQuery<ChartData>({
     queryKey: ["reports", "charts"],

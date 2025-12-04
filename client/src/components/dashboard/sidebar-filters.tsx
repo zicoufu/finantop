@@ -12,7 +12,20 @@ interface Account {
   balance: string | number;
 }
 
-export default function SidebarFilters() {
+interface DashboardFilters {
+  startDate: string;
+  endDate: string;
+  year: string;
+  month: string;
+}
+
+interface SidebarFiltersProps {
+  filters: DashboardFilters;
+  onFiltersChange: (filters: DashboardFilters) => void;
+  onResetFilters: () => void;
+}
+
+export default function SidebarFilters({ filters, onFiltersChange, onResetFilters }: SidebarFiltersProps) {
   const { data: accounts, isLoading: isLoadingAccounts } = useQuery<Account[]>({
     queryKey: ["accounts"],
     queryFn: () => api("/api/accounts"),
@@ -72,11 +85,27 @@ export default function SidebarFilters() {
           <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Período</label>
           <div className="flex space-x-2">
             <div className="relative w-1/2">
-              <input id="period-start" aria-label="Data inicial" placeholder="dd/mm/aaaa" className="w-full pl-3 pr-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md text-sm h-9" type="text" defaultValue="01/07/2023" />
+              <input
+                id="period-start"
+                aria-label="Data inicial"
+                placeholder="dd/mm/aaaa"
+                className="w-full pl-3 pr-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md text-sm h-9"
+                type="text"
+                value={filters.startDate}
+                onChange={(e) => onFiltersChange({ ...filters, startDate: e.target.value })}
+              />
               <Calendar aria-hidden className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
             </div>
             <div className="relative w-1/2">
-              <input id="period-end" aria-label="Data final" placeholder="dd/mm/aaaa" className="w-full pl-3 pr-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md text-sm h-9" type="text" defaultValue="30/12/2024" />
+              <input
+                id="period-end"
+                aria-label="Data final"
+                placeholder="dd/mm/aaaa"
+                className="w-full pl-3 pr-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md text-sm h-9"
+                type="text"
+                value={filters.endDate}
+                onChange={(e) => onFiltersChange({ ...filters, endDate: e.target.value })}
+              />
               <Calendar aria-hidden className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
             </div>
           </div>
@@ -84,7 +113,10 @@ export default function SidebarFilters() {
 
         <div>
           <label htmlFor="filter-year" className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Ano</label>
-          <Select>
+          <Select
+            value={filters.year}
+            onValueChange={(value) => onFiltersChange({ ...filters, year: value })}
+          >
             <SelectTrigger id="filter-year" aria-label="Ano">
               <SelectValue placeholder="2023" />
             </SelectTrigger>
@@ -96,7 +128,10 @@ export default function SidebarFilters() {
 
         <div>
           <label htmlFor="filter-month" className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Mês</label>
-          <Select>
+          <Select
+            value={filters.month}
+            onValueChange={(value) => onFiltersChange({ ...filters, month: value })}
+          >
             <SelectTrigger id="filter-month" aria-label="Mês">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
@@ -106,7 +141,13 @@ export default function SidebarFilters() {
           </Select>
         </div>
 
-        <Button variant="outline" className="w-full">Limpar filtros</Button>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={onResetFilters}
+        >
+          Limpar filtros
+        </Button>
       </div>
     </aside>
   );

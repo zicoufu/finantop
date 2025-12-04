@@ -27,6 +27,13 @@ interface Category {
   type: string;
 }
 
+interface DashboardFilters {
+  startDate: string;
+  endDate: string;
+  year: string;
+  month: string;
+}
+
 const iconMap: { [key: string]: any } = {
   "fas fa-briefcase": Briefcase,
   "fas fa-shopping-cart": ShoppingCart,
@@ -35,7 +42,11 @@ const iconMap: { [key: string]: any } = {
   "fas fa-utensils": Utensils,
 };
 
-export default function RecentTransactions() {
+interface RecentTransactionsProps {
+  filters: DashboardFilters;
+}
+
+export default function RecentTransactions({ filters }: RecentTransactionsProps) {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<"all" | "income" | "expense">("all");
 
@@ -122,8 +133,43 @@ export default function RecentTransactions() {
     );
   }
 
+  const parseFilterDate = (value: string) => {
+    if (!value) return null;
+    const [day, month, year] = value.split("/");
+    if (!day || !month || !year) return null;
+    return new Date(Number(year), Number(month) - 1, Number(day));
+  };
+
+  const startFilterDate = parseFilterDate(filters.startDate);
+  const endFilterDate = parseFilterDate(filters.endDate);
+
   const filteredTransactions = transactions
     .filter(t => filter === "all" || t.type === filter)
+    .filter(t => {
+      const txDate = new Date(t.date);
+
+      if (filters.year && txDate.getFullYear().toString() !== filters.year) {
+        return false;
+      }
+
+      if (filters.month !== "all" && filters.month) {
+        const monthIndex = txDate.getMonth() + 1;
+        const monthString = monthIndex.toString().padStart(2, "0");
+        if (monthString !== filters.month) {
+          return false;
+        }
+      }
+
+      if (startFilterDate && txDate < startFilterDate) {
+        return false;
+      }
+
+      if (endFilterDate && txDate > endFilterDate) {
+        return false;
+      }
+
+      return true;
+    })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 10);
 

@@ -17,6 +17,12 @@ import BalanceChart from "@/components/dashboard/balance-chart";
 
 export default function Dashboard() {
   const [period, setPeriod] = useState("current-month");
+  const [filters, setFilters] = useState({
+    startDate: "01/01/2023",
+    endDate: "31/12/2023",
+    year: "2023",
+    month: "all",
+  });
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -27,7 +33,18 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-full">
-      <SidebarFilters />
+      <SidebarFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        onResetFilters={() =>
+          setFilters({
+            startDate: "01/01/2023",
+            endDate: "31/12/2023",
+            year: "2023",
+            month: "all",
+          })
+        }
+      />
       <main className="flex-1 flex flex-col h-full">
         {/* Header */}
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
@@ -82,12 +99,12 @@ export default function Dashboard() {
           {/* Top sections grid: incomes and expenses categories */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <TopIncomeCategories />
-            <ExpenseChart />
+            <ExpenseChart filters={filters} />
           </div>
 
           {/* Evolution monthly combined chart */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <BalanceChart />
+            <BalanceChart filters={filters} />
           </div>
 
           {/* Category KPI mini-cards grid */}
@@ -96,7 +113,7 @@ export default function Dashboard() {
           </div>
 
           {/* Keep existing recent transactions list below */}
-          <RecentTransactions />
+          <RecentTransactions filters={filters} />
         </div>
       </main>
     </div>
