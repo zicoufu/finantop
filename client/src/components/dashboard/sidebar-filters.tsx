@@ -48,9 +48,8 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
         </div>
 
         <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="flex justify-between items-center text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">
-            <span>Contas</span>
-            <span>Saldo</span>
+          <div className="flex items-center text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">
+            <span>Contas bancárias</span>
           </div>
           {isLoadingAccounts ? (
             <div className="text-sm text-gray-500 dark:text-gray-400">
