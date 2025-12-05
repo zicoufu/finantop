@@ -917,6 +917,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const allTransactions = await storage.getTransactions(userId);
       console.log(`[GET /api/reports/charts] Fetched ${allTransactions.length} transactions.`);
       console.log('[GET /api/reports/charts] First transaction sample:', allTransactions.length > 0 ? JSON.stringify(allTransactions[0]) : 'No transactions');
+
+      // Aplicar filtros de período/ano/mês se fornecidos
+      const { startDate, endDate, year, month } = req.query as {
+        startDate?: string;
+        endDate?: string;
+        year?: string;
+        month?: string;
+      };
+
+      let filteredTransactions = allTransactions;
+
+      if (startDate) {
+        const start = new Date(startDate);
+        filteredTransactions = filteredTransactions.filter(t => new Date(t.date) >= start);
+      }
+
+      if (endDate) {
+        const end = new Date(endDate);
+        filteredTransactions = filteredTransactions.filter(t => new Date(t.date) <= end);
+      }
+
+      if (year) {
+        const yearNum = parseInt(year, 10);
+        if (!isNaN(yearNum)) {
+          filteredTransactions = filteredTransactions.filter(t => new Date(t.date).getFullYear() === yearNum);
+        }
+      }
+
+      if (month && month !== 'all') {
+        const monthNum = parseInt(month, 10) - 1; // 0-based
+        if (!isNaN(monthNum)) {
+          filteredTransactions = filteredTransactions.filter(t => new Date(t.date).getMonth() === monthNum);
+        }
+      }
       
       // Obter todas as categorias
       const userIdForCategories = getUserIdFromRequest(req);
@@ -925,7 +959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('[GET /api/reports/charts] First category sample:', allCategories.length > 0 ? JSON.stringify(allCategories[0]) : 'No categories');
       
       // Se não houver transações, retornar dados vazios
-      if (allTransactions.length === 0) {
+      if (filteredTransactions.length === 0) {
         console.log('[GET /api/reports/charts] No transactions found. Returning empty data.');
         return res.json({
           expensesByCategory: [],
@@ -937,7 +971,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calcular despesas por categoria
       const expenseCategories = allCategories.filter(c => c.type === 'expense');
       const expensesByCategory = expenseCategories.map(category => {
-        const categoryTransactions = allTransactions.filter(t => 
+        const categoryTransactions = filteredTransactions.filter(t => 
           t.categoryId === category.id && 
           t.type === 'expense' && 
           t.status === 'paid'
@@ -958,9 +992,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Agrupar transações por mês
       const transactionsByMonth: Record<number, any[]> = {};
-      const currentYear = new Date().getFullYear();
+      const currentYear = year ? parseInt(year as string, 10) || new Date().getFullYear() : new Date().getFullYear();
       
-      allTransactions.forEach(transaction => {
+      filteredTransactions.forEach(transaction => {
         const transactionDate = new Date(transaction.date);
         if (transactionDate.getFullYear() === currentYear) {
           const month = transactionDate.getMonth();
@@ -1016,12 +1050,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Entradas por categoria (suporta ?limit=<n> para Top N)
+  // Entradas por categoria (suporta ?limit=<n> para Top N e filtros de período/ano/mês)
   app.get("/api/reports/top-income-by-category", protect, async (req, res) => {
     try {
       const userId = getUserIdFromRequest(req);
       const limitParam = parseInt((req.query?.limit as string) || "");
       const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : undefined;
+
       const [allTransactions, allCategories] = await Promise.all([
         storage.getTransactions(userId),
         storage.getCategories(userId),
@@ -1031,10 +1066,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ items: [], hasData: false });
       }
 
+      // Aplicar filtros de período/ano/mês se fornecidos
+      const { startDate, endDate, year, month } = req.query as {
+        startDate?: string;
+        endDate?: string;
+        year?: string;
+        month?: string;
+      };
+
+      let filteredTransactions = allTransactions;
+
+      if (startDate) {
+        const start = new Date(startDate);
+        filteredTransactions = filteredTransactions.filter(t => new Date(t.date) >= start);
+      }
+
+      if (endDate) {
+        const end = new Date(endDate);
+        filteredTransactions = filteredTransactions.filter(t => new Date(t.date) <= end);
+      }
+
+      if (year) {
+        const yearNum = parseInt(year, 10);
+        if (!isNaN(yearNum)) {
+          filteredTransactions = filteredTransactions.filter(t => new Date(t.date).getFullYear() === yearNum);
+        }
+      }
+
+      if (month && month !== 'all') {
+        const monthNum = parseInt(month, 10) - 1; // 0-based
+        if (!isNaN(monthNum)) {
+          filteredTransactions = filteredTransactions.filter(t => new Date(t.date).getMonth() === monthNum);
+        }
+      }
+
+      if (!filteredTransactions || filteredTransactions.length === 0) {
+        return res.json({ items: [], hasData: false });
+      }
+
       const incomeCategories = allCategories.filter((c: any) => c.type === 'income');
       let items = incomeCategories
         .map((category: any) => {
-          const categoryTransactions = allTransactions.filter((t: any) =>
+          const categoryTransactions = filteredTransactions.filter((t: any) =>
             t.categoryId === category.id && t.type === 'income' && t.status === 'received'
           );
           const total = categoryTransactions.reduce((sum: number, t: any) => sum + parseFloat(t.amount), 0);
@@ -1044,7 +1117,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             color: category.color || '#' + Math.floor(Math.random() * 16777215).toString(16),
           };
         })
+        .filter((item: any) => item.value > 0)
         .sort((a: any, b: any) => b.value - a.value);
+
       if (limit) {
         items = items.slice(0, limit);
       }
