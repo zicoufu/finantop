@@ -30,6 +30,9 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
     queryKey: ["accounts"],
     queryFn: () => api("/api/accounts"),
   });
+
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 5 }, (_, i) => (currentYear - 2 + i).toString());
   return (
     <aside className="w-80 flex-shrink-0 bg-white dark:bg-gray-900 p-6 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto">
       <div className="flex items-center p-3 bg-gray-100 dark:bg-gray-800 rounded-lg mb-6" />
@@ -117,10 +120,12 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
             onValueChange={(value) => onFiltersChange({ ...filters, year: value })}
           >
             <SelectTrigger id="filter-year" aria-label="Ano">
-              <SelectValue placeholder="2023" />
+              <SelectValue placeholder={currentYear.toString()} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="2023">2023</SelectItem>
+              {yearOptions.map((year) => (
+                <SelectItem key={year} value={year}>{year}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
