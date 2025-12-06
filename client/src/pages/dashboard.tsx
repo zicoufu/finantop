@@ -201,12 +201,15 @@ export default function Dashboard() {
                         .slice(0, 5)
                         .map((tx) => {
                           const amount = parseFloat(tx.amount || "0");
-                          const dateLabel = tx.dueDate || tx.date;
+                          const rawDate = tx.dueDate || tx.date;
+                          const dateLabel = rawDate
+                            ? new Date(rawDate).toLocaleDateString("pt-BR")
+                            : "";
                           return (
                             <li key={tx.id} className="flex justify-between items-center">
                               <div>
                                 <p className="font-medium">{tx.description}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Vencimento: {dateLabel?.substring(0, 10)}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Vencimento: {dateLabel}</p>
                               </div>
                               <span className="font-semibold">R$ {amount.toFixed(2)}</span>
                             </li>
