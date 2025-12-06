@@ -230,17 +230,34 @@ const transactionValidationSchema = baseInsertTransactionSchema.extend({
   // Garante tipos e status válidos de forma explícita
   type: z.enum(["income", "expense"]),
   status: z.enum(["pending", "paid", "received", "overdue"]),
+  // Relacionamentos devem ser IDs inteiros positivos
+  accountId: z.coerce.number().int().positive({ message: "Conta é obrigatória" }),
+  categoryId: z.coerce.number().int().positive({ message: "Categoria é obrigatória" }),
 });
 
-export const insertTransactionSchema = transactionValidationSchema.refine(
-  (data) =>
-    (data.type === "income" && ["pending", "received"].includes(data.status)) ||
-    (data.type === "expense" && ["pending", "paid", "overdue"].includes(data.status)),
-  {
-    message: "Combinação inválida entre tipo e status da transação",
-    path: ["status"],
-  },
-);
+export const insertTransactionSchema = transactionValidationSchema
+  // Regras de consistência entre tipo e status
+  .refine(
+    (data) =>
+      (data.type === "income" && ["pending", "received"].includes(data.status)) ||
+      (data.type === "expense" && ["pending", "paid", "overdue"].includes(data.status)),
+    {
+      message: "Combinação inválida entre tipo e status da transação",
+      path: ["status"],
+    },
+  )
+  // Se dueDate existir, não pode ser anterior à date
+  .refine(
+    (data) => {
+      if (!data.dueDate) return true;
+      // date e dueDate aqui já são Date por causa do baseInsertTransactionSchema
+      return data.dueDate >= data.date;
+    },
+    {
+      message: "Data de vencimento não pode ser anterior à data da transação",
+      path: ["dueDate"],
+    },
+  );
 
 export const updateTransactionSchema = transactionValidationSchema.partial();
 
