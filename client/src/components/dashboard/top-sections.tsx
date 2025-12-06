@@ -136,6 +136,93 @@ export function TopExpenseCategories() {
   );
 }
 
+interface ChartsResponse {
+  expensesByCategory: { name: string; value: number; color: string }[];
+  balanceEvolution: { month: string; income: number; expenses: number; balance: number }[];
+  hasData: boolean;
+}
+
+interface CategoryKPIsGridProps {
+  filters: DashboardFilters;
+}
+
+export function CategoryKPIsGrid({ filters }: CategoryKPIsGridProps) {
+  const buildQueryUrl = () => {
+    const params = new URLSearchParams();
+
+    const parseFilterDateToIso = (value: string) => {
+      if (!value) return null;
+      const [day, month, year] = value.split("/");
+      if (!day || !month || !year) return null;
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    };
+
+    const startIso = parseFilterDateToIso(filters.startDate);
+    const endIso = parseFilterDateToIso(filters.endDate);
+
+    if (startIso) params.set("startDate", startIso);
+    if (endIso) params.set("endDate", endIso);
+    if (filters.year) params.set("year", filters.year);
+    if (filters.month && filters.month !== "all") params.set("month", filters.month);
+
+    const queryString = params.toString();
+    return queryString ? `/api/reports/charts?${queryString}` : "/api/reports/charts";
+  };
+
+  const { data, isLoading, isError } = useQuery<ChartsResponse>({
+    queryKey: ["reports", "charts", "kpi-categories", filters],
+    queryFn: () => api(buildQueryUrl()),
+  });
+
+  const items = (data?.expensesByCategory || []).slice(0, 4);
+  const palette = [
+    "bg-orange-500/15 text-orange-600",
+    "bg-yellow-500/15 text-yellow-600",
+    "bg-indigo-500/15 text-indigo-600",
+    "bg-teal-500/15 text-teal-600",
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center space-x-4 animate-pulse">
+            <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg w-10 h-10" />
+            <div className="space-y-1">
+              <div className="h-3 w-20 bg-gray-100 dark:bg-gray-800 rounded" />
+              <div className="h-4 w-16 bg-gray-100 dark:bg-gray-800 rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (isError || !items.length) {
+    return (
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3 text-sm text-gray-500 dark:text-gray-400">
+        Sem dados suficientes de despesas por categoria neste período.
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
+      {items.map((cat, idx) => (
+        <div key={cat.name} className="flex items-center space-x-4">
+          <div className={`p-3 rounded-lg ${palette[idx % palette.length]}`}>
+            <span className="text-lg font-semibold">{cat.name.charAt(0).toUpperCase()}</span>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[7rem]">{cat.name}</p>
+            <p className="text-xl font-bold">{formatCurrency(cat.value)}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function EvolutionMonthly() {
   return (
     <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3">
@@ -154,49 +241,6 @@ export function EvolutionMonthly() {
           className="w-full h-full object-contain"
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKT6WAPJxnAgp25XF2r6p_4nVYun9Jrq9L5E7F3buQaNt7rremycMSXc5qRdO6wS7vIVFl35tRQijjyUBtf29d1F4Ligk8YlsJiBHy6-HaB46vCPFOlk8Qkaog2qlNN2_AmM6nQtKw1t-AUC5162AeHzCHPRlJC_1StF_T601eKniW5CMV8fwqe3cpJYHV68Y9su21ngo44hPpqwgLimAu11H-Tfc1w3o5jFsri4NLQRu8qfHVf3EGtAXrl1avKEqfN7g81adyZxM"
         />
-      </div>
-    </div>
-  );
-}
-
-export function CategoryKPIsGrid() {
-  return (
-    <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div className="flex items-center space-x-4">
-        <div className="p-3 bg-orange-500/20 rounded-lg">
-          <span className="material-icons-outlined text-orange-500">home</span>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Moradia</p>
-          <p className="text-xl font-bold">R$ 2.929</p>
-        </div>
-      </div>
-      <div className="flex items-center space-x-4">
-        <div className="p-3 bg-yellow-500/20 rounded-lg">
-          <span className="material-icons-outlined text-yellow-500">celebration</span>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Lazer</p>
-          <p className="text-xl font-bold">R$ 900</p>
-        </div>
-      </div>
-      <div className="flex items-center space-x-4">
-        <div className="p-3 bg-indigo-500/20 rounded-lg">
-          <span className="material-icons-outlined text-indigo-500">credit_card</span>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Cartão</p>
-          <p className="text-xl font-bold">R$ 1.800</p>
-        </div>
-      </div>
-      <div className="flex items-center space-x-4">
-        <div className="p-3 bg-teal-500/20 rounded-lg">
-          <span className="material-icons-outlined text-teal-500">directions_car</span>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Transporte</p>
-          <p className="text-xl font-bold">R$ 1.500</p>
-        </div>
       </div>
     </div>
   );
