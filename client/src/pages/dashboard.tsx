@@ -18,9 +18,9 @@ import BalanceChart from "@/components/dashboard/balance-chart";
 export default function Dashboard() {
   const [period, setPeriod] = useState("current-month");
   const [filters, setFilters] = useState({
-    startDate: "01/01/2023",
-    endDate: "31/12/2023",
-    year: "2023",
+    startDate: "",
+    endDate: "",
+    year: new Date().getFullYear().toString(),
     month: "all",
   });
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -31,6 +31,39 @@ export default function Dashboard() {
     queryFn: () => api("/api/categories?type=expense"),
   });
 
+  const getPeriodLabel = () => {
+    const { startDate, endDate, year, month } = filters;
+
+    if (startDate && endDate) {
+      return `Período: ${startDate} a ${endDate}`;
+    }
+
+    if (month && month !== "all" && year) {
+      const monthNames: Record<string, string> = {
+        "1": "Janeiro",
+        "2": "Fevereiro",
+        "3": "Março",
+        "4": "Abril",
+        "5": "Maio",
+        "6": "Junho",
+        "7": "Julho",
+        "8": "Agosto",
+        "9": "Setembro",
+        "10": "Outubro",
+        "11": "Novembro",
+        "12": "Dezembro",
+      };
+      const monthLabel = monthNames[month] ?? month;
+      return `Período: ${monthLabel}/${year}`;
+    }
+
+    if (year) {
+      return `Período: Ano de ${year}`;
+    }
+
+    return "Período: Todo o histórico";
+  };
+
   return (
     <div className="flex h-full">
       <SidebarFilters
@@ -38,9 +71,9 @@ export default function Dashboard() {
         onFiltersChange={setFilters}
         onResetFilters={() =>
           setFilters({
-            startDate: "01/01/2023",
-            endDate: "31/12/2023",
-            year: "2023",
+            startDate: "",
+            endDate: "",
+            year: new Date().getFullYear().toString(),
             month: "all",
           })
         }
@@ -93,6 +126,9 @@ export default function Dashboard() {
 
         {/* Dashboard Content */}
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
+          <div className="mb-2 text-sm text-gray-500">
+            {getPeriodLabel()}
+          </div>
           {/* Hero KPIs matching visual design */}
           <KPIHero />
 

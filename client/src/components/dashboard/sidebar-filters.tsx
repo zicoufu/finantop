@@ -35,7 +35,9 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
   const yearOptions = Array.from({ length: 5 }, (_, i) => (currentYear - 2 + i).toString());
   return (
     <aside className="w-80 flex-shrink-0 bg-white dark:bg-gray-900 p-6 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto">
-      <div className="flex items-center p-3 bg-gray-100 dark:bg-gray-800 rounded-lg mb-6" />
+      <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-800 rounded-lg mb-6 text-sm text-gray-600 dark:text-gray-300">
+        <span>Filtros do painel</span>
+      </div>
 
       <div className="space-y-6">
         <div>
@@ -121,6 +123,7 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
             min="1900"
             max="2100"
             className="w-full pl-3 pr-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md text-sm h-9"
+            placeholder="Ex: 2025"
             value={filters.year}
             onChange={(e) => onFiltersChange({ ...filters, year: e.target.value })}
           />
