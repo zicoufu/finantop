@@ -31,6 +31,33 @@ export default function Dashboard() {
     queryFn: () => api("/api/categories?type=expense"),
   });
 
+  const buildReportsQueryUrl = () => {
+    const params = new URLSearchParams();
+
+    const parseFilterDateToIso = (value: string) => {
+      if (!value) return null;
+      const [day, month, year] = value.split("/");
+      if (!day || !month || !year) return null;
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    };
+
+    const startIso = parseFilterDateToIso(filters.startDate);
+    const endIso = parseFilterDateToIso(filters.endDate);
+
+    if (startIso) params.set("startDate", startIso);
+    if (endIso) params.set("endDate", endIso);
+    if (filters.year) params.set("year", filters.year);
+    if (filters.month && filters.month !== "all") params.set("month", filters.month);
+
+    const queryString = params.toString();
+    return queryString ? `/api/reports/charts?${queryString}` : "/api/reports/charts";
+  };
+
+  const { data: reportsSummary } = useQuery<{ hasData: boolean; expensesByCategory: unknown[]; balanceEvolution: unknown[] } | undefined>({
+    queryKey: ["reports", "charts", "summary", filters],
+    queryFn: () => api(buildReportsQueryUrl()),
+  });
+
   const getPeriodLabel = () => {
     const { startDate, endDate, year, month } = filters;
 
@@ -128,6 +155,9 @@ export default function Dashboard() {
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
           <div className="mb-2 text-sm text-gray-500">
             {getPeriodLabel()}
+            {reportsSummary && (!reportsSummary.hasData || ((reportsSummary.expensesByCategory?.length ?? 0) === 0 && (reportsSummary.balanceEvolution?.length ?? 0) === 0)) && (
+              <span className="italic"> — não houve lançamentos de rendas e despesas.</span>
+            )}
           </div>
           {/* Hero KPIs matching visual design */}
           <KPIHero />
