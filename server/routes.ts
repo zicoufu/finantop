@@ -976,20 +976,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Calcular despesas por categoria
-      const expenseCategories = allCategories.filter(c => c.type === 'expense');
-      const expensesByCategory = expenseCategories.map(category => {
-        const categoryTransactions = filteredTransactions.filter(t => 
-          t.categoryId === category.id && 
-          t.type === 'expense' && 
-          t.status === 'paid'
-        );
-        const total = categoryTransactions.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-        return {
-          name: category.name,
-          value: total,
-          color: category.color || '#' + Math.floor(Math.random()*16777215).toString(16) // Gerar cor aleatória se não houver
-        };
-      }).filter(item => item.value > 0);
+      // Em vez de depender de category.type === 'expense', consideramos
+      // qualquer categoria que tenha transações de despesa pagas no período filtrado.
+      const expensesByCategory = allCategories
+        .map(category => {
+          const categoryTransactions = filteredTransactions.filter(t => 
+            t.categoryId === category.id && 
+            t.type === 'expense' && 
+            t.status === 'paid'
+          );
+          const total = categoryTransactions.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+          return {
+            name: category.name,
+            value: total,
+            color: category.color || '#' + Math.floor(Math.random()*16777215).toString(16) // Gerar cor aleatória se não houver
+          };
+        })
+        .filter(item => item.value > 0);
       
       // Gerar dados de evolução do saldo por mês
       const months = [
