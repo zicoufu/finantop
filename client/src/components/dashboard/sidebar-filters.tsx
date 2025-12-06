@@ -115,19 +115,15 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
 
         <div>
           <label htmlFor="filter-year" className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Ano</label>
-          <Select
+          <input
+            id="filter-year"
+            type="number"
+            min="1900"
+            max="2100"
+            className="w-full pl-3 pr-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md text-sm h-9"
             value={filters.year}
-            onValueChange={(value) => onFiltersChange({ ...filters, year: value })}
-          >
-            <SelectTrigger id="filter-year" aria-label="Ano">
-              <SelectValue placeholder={currentYear.toString()} />
-            </SelectTrigger>
-            <SelectContent>
-              {yearOptions.map((year) => (
-                <SelectItem key={year} value={year}>{year}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(e) => onFiltersChange({ ...filters, year: e.target.value })}
+          />
         </div>
 
         <div>

@@ -47,9 +47,32 @@ interface ExpenseChartProps {
 
 export default function ExpenseChart({ filters }: ExpenseChartProps) {
   const { t } = useTranslation();
+  
+  const buildQueryUrl = () => {
+    const params = new URLSearchParams();
+
+    const parseFilterDateToIso = (value: string) => {
+      if (!value) return null;
+      const [day, month, year] = value.split("/");
+      if (!day || !month || !year) return null;
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    };
+
+    const startIso = parseFilterDateToIso(filters.startDate);
+    const endIso = parseFilterDateToIso(filters.endDate);
+
+    if (startIso) params.set("startDate", startIso);
+    if (endIso) params.set("endDate", endIso);
+    if (filters.year) params.set("year", filters.year);
+    if (filters.month && filters.month !== "all") params.set("month", filters.month);
+
+    const queryString = params.toString();
+    return queryString ? `/api/reports/charts?${queryString}` : "/api/reports/charts";
+  };
+
   const { data: chartData, isLoading, isError } = useQuery<ChartData>({
-    queryKey: ["reports", "charts"],
-    queryFn: () => api("/api/reports/charts"),
+    queryKey: ["reports", "charts", filters],
+    queryFn: () => api(buildQueryUrl()),
   });
 
   if (isLoading) {

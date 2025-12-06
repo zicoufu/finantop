@@ -213,14 +213,36 @@ export const insertAccountSchema = createInsertSchema(accounts, {
   creditLimit: z.coerce.number().min(0).optional(),
 }).omit({ id: true, createdAt: true, updatedAt: true });
 
-export const insertTransactionSchema = createInsertSchema(transactions, {
+// ---------- Transactions validation ----------
+// Schema base vindo do Drizzle (sem refinamentos extras)
+const baseInsertTransactionSchema = createInsertSchema(transactions, {
   date: z.coerce.date(),
   dueDate: z.coerce.date().optional().nullable(),
-  // amount: z.string().refine(value => !isNaN(parseFloat(value)), { message: "Amount must be a valid number string" }).transform(value => parseFloat(value).toFixed(2)),
-  // categoryId, userId já são inferidos como number e notNull, o que é bom.
 }).omit({ id: true, createdAt: true, updatedAt: true });
 
-export const updateTransactionSchema = insertTransactionSchema.partial();
+// Adiciona validações mais fortes para campos críticos
+const transactionValidationSchema = baseInsertTransactionSchema.extend({
+  // Converte amount (string ou número) para número positivo e armazena com 2 casas decimais
+  amount: z.coerce
+    .number({ invalid_type_error: "Valor deve ser numérico" })
+    .min(0.01, { message: "Valor deve ser maior que zero" })
+    .transform((value) => value.toFixed(2)),
+  // Garante tipos e status válidos de forma explícita
+  type: z.enum(["income", "expense"]),
+  status: z.enum(["pending", "paid", "received", "overdue"]),
+});
+
+export const insertTransactionSchema = transactionValidationSchema.refine(
+  (data) =>
+    (data.type === "income" && ["pending", "received"].includes(data.status)) ||
+    (data.type === "expense" && ["pending", "paid", "overdue"].includes(data.status)),
+  {
+    message: "Combinação inválida entre tipo e status da transação",
+    path: ["status"],
+  },
+);
+
+export const updateTransactionSchema = transactionValidationSchema.partial();
 
 export const insertAlertSchema = createInsertSchema(alerts).omit({ id: true, createdAt: true, updatedAt: true });
 

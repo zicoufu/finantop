@@ -429,15 +429,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const userId = getUserIdFromRequest(req);
       console.log(`[GET /api/transactions] Usando ID de usuário: ${userId}`);
+
+      const transactionType = type ? String(type) : undefined;
       
       if (upcoming) {
         const days = parseInt(upcoming as string) || 7;
         transactions = await storage.getUpcomingTransactions(userId, days);
       } else if (startDate && endDate) {
-        transactions = await storage.getTransactionsByDateRange(userId, new Date(startDate as string), new Date(endDate as string));
-      } else if (type) {
-        // Garantir que o tipo seja uma string válida
-        const transactionType = type as string;
+        const start = new Date(startDate as string);
+        const end = new Date(endDate as string);
+
+        // Quando vierem período E tipo, aplicar os dois filtros
+        const allInRange = await storage.getTransactionsByDateRange(userId, start, end);
+        transactions = transactionType
+          ? allInRange.filter((tx) => tx.type === transactionType)
+          : allInRange;
+      } else if (transactionType) {
         console.log(`[GET /api/transactions] Buscando transações do tipo: ${transactionType}`);
         transactions = await storage.getTransactionsByType(userId, transactionType);
       } else {

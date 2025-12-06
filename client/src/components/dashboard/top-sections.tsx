@@ -5,11 +5,46 @@ import { formatCurrency } from "@/lib/currency";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export function TopIncomeCategories() {
+interface DashboardFilters {
+  startDate: string;
+  endDate: string;
+  year: string;
+  month: string;
+}
+
+interface TopIncomeCategoriesProps {
+  filters: DashboardFilters;
+}
+
+export function TopIncomeCategories({ filters }: TopIncomeCategoriesProps) {
   const [limit, setLimit] = useState<string>("all");
+  
+  const buildQueryUrl = () => {
+    const params = new URLSearchParams();
+
+    const parseFilterDateToIso = (value: string) => {
+      if (!value) return null;
+      const [day, month, year] = value.split("/");
+      if (!day || !month || !year) return null;
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    };
+
+    const startIso = parseFilterDateToIso(filters.startDate);
+    const endIso = parseFilterDateToIso(filters.endDate);
+
+    if (startIso) params.set("startDate", startIso);
+    if (endIso) params.set("endDate", endIso);
+    if (filters.year) params.set("year", filters.year);
+    if (filters.month && filters.month !== "all") params.set("month", filters.month);
+    if (limit && limit !== "all") params.set("limit", limit);
+
+    const queryString = params.toString();
+    return queryString ? `/api/reports/top-income-by-category?${queryString}` : "/api/reports/top-income-by-category";
+  };
+
   const { data, isLoading, isError } = useQuery<{ items: { name: string; value: number; color: string }[]; hasData: boolean }>({
-    queryKey: ["reports", "top-income-by-category", limit],
-    queryFn: () => api(`/api/reports/top-income-by-category${limit !== 'all' ? `?limit=${limit}` : ''}`),
+    queryKey: ["reports", "top-income-by-category", limit, filters],
+    queryFn: () => api(buildQueryUrl()),
   });
 
   const items = data?.items || [];
