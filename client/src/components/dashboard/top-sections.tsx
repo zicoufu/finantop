@@ -5,15 +5,13 @@ import { formatCurrency } from "@/lib/currency";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface DashboardFilters {
-  startDate: string;
-  endDate: string;
-  year: string;
-  month: string;
-}
-
 interface TopIncomeCategoriesProps {
-  filters: DashboardFilters;
+  filters: {
+    startDate: string;
+    endDate: string;
+    year: string;
+    month: string;
+  };
 }
 
 export function TopIncomeCategories({ filters }: TopIncomeCategoriesProps) {
@@ -136,45 +134,14 @@ export function TopExpenseCategories() {
   );
 }
 
-interface ChartsResponse {
-  expensesByCategory: { name: string; value: number; color: string }[];
-  balanceEvolution: { month: string; income: number; expenses: number; balance: number }[];
-  hasData: boolean;
-}
-
 interface CategoryKPIsGridProps {
-  filters: DashboardFilters;
+  items: { name: string; value: number; color: string }[];
+  isLoading: boolean;
+  isError: boolean;
 }
 
-export function CategoryKPIsGrid({ filters }: CategoryKPIsGridProps) {
-  const buildQueryUrl = () => {
-    const params = new URLSearchParams();
-
-    const parseFilterDateToIso = (value: string) => {
-      if (!value) return null;
-      const [day, month, year] = value.split("/");
-      if (!day || !month || !year) return null;
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    };
-
-    const startIso = parseFilterDateToIso(filters.startDate);
-    const endIso = parseFilterDateToIso(filters.endDate);
-
-    if (startIso) params.set("startDate", startIso);
-    if (endIso) params.set("endDate", endIso);
-    if (filters.year) params.set("year", filters.year);
-    if (filters.month && filters.month !== "all") params.set("month", filters.month);
-
-    const queryString = params.toString();
-    return queryString ? `/api/reports/charts?${queryString}` : "/api/reports/charts";
-  };
-
-  const { data, isLoading, isError } = useQuery<ChartsResponse>({
-    queryKey: ["reports", "charts", "kpi-categories", filters],
-    queryFn: () => api(buildQueryUrl()),
-  });
-
-  const items = (data?.expensesByCategory || []).slice(0, 4);
+export function CategoryKPIsGrid({ items, isLoading, isError }: CategoryKPIsGridProps) {
+  const topItems = (items || []).slice(0, 4);
   const palette = [
     "bg-orange-500/15 text-orange-600",
     "bg-yellow-500/15 text-yellow-600",
@@ -198,7 +165,7 @@ export function CategoryKPIsGrid({ filters }: CategoryKPIsGridProps) {
     );
   }
 
-  if (isError || !items.length) {
+  if (isError || !topItems.length) {
     return (
       <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3 text-sm text-gray-500 dark:text-gray-400">
         Sem dados suficientes de despesas por categoria neste período.
@@ -208,7 +175,7 @@ export function CategoryKPIsGrid({ filters }: CategoryKPIsGridProps) {
 
   return (
     <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
-      {items.map((cat, idx) => (
+      {topItems.map((cat, idx) => (
         <div key={cat.name} className="flex items-center space-x-4">
           <div className={`p-3 rounded-lg ${palette[idx % palette.length]}`}>
             <span className="text-lg font-semibold">{cat.name.charAt(0).toUpperCase()}</span>

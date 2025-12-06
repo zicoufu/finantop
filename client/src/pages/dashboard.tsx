@@ -70,7 +70,11 @@ export default function Dashboard() {
     return queryString ? `/api/reports/charts?${queryString}` : "/api/reports/charts";
   };
 
-  const { data: reportsSummary } = useQuery<{ hasData: boolean; expensesByCategory: unknown[]; balanceEvolution: unknown[] } | undefined>({
+  const {
+    data: reportsSummary,
+    isLoading: isReportsLoading,
+    isError: isReportsError,
+  } = useQuery<{ hasData: boolean; expensesByCategory: { name: string; value: number; color: string }[]; balanceEvolution: unknown[] } | undefined>({
     queryKey: ["reports", "charts", "summary", filters],
     queryFn: () => api(buildReportsQueryUrl()),
   });
@@ -257,7 +261,11 @@ export default function Dashboard() {
 
           {/* Category KPI mini-cards grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <CategoryKPIsGrid />
+            <CategoryKPIsGrid
+              items={reportsSummary?.expensesByCategory ?? []}
+              isLoading={isReportsLoading}
+              isError={isReportsError}
+            />
           </div>
 
           {/* Keep existing recent transactions list below */}
