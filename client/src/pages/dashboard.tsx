@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus } from "lucide-react";
 import ExpenseForm from "@/components/forms/expense-form";
 import RecentTransactions from "@/components/dashboard/recent-transactions";
-import { Category } from "@/lib/types";
+import { Category, Transaction } from "@/lib/types";
 import { api } from "@/lib/api";
 import { useTranslation } from "react-i18next";
 import SidebarFilters from "@/components/dashboard/sidebar-filters";
@@ -29,6 +29,23 @@ export default function Dashboard() {
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ["categories", "expense"],
     queryFn: () => api("/api/categories?type=expense"),
+  });
+
+  // Tarefas de hoje / visão rápida da semana
+  const today = new Date();
+  const endIso = today.toISOString().split("T")[0];
+  const startForWeek = new Date(today);
+  startForWeek.setDate(startForWeek.getDate() - 6);
+  const startIso = startForWeek.toISOString().split("T")[0];
+
+  const { data: upcomingTransactions = [] } = useQuery<Transaction[]>({
+    queryKey: ["transactions", "upcoming", 7],
+    queryFn: () => api("/api/transactions?upcoming=7"),
+  });
+
+  const { data: lastWeekTransactions = [] } = useQuery<Transaction[]>({
+    queryKey: ["transactions", "last-week", startIso, endIso],
+    queryFn: () => api(`/api/transactions?startDate=${startIso}&endDate=${endIso}`),
   });
 
   const buildReportsQueryUrl = () => {
@@ -161,6 +178,68 @@ export default function Dashboard() {
           </div>
           {/* Hero KPIs matching visual design */}
           <KPIHero />
+
+          {/* Tarefas de hoje / visão rápida */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Tarefas de hoje</h2>
+                <Button size="sm" variant="outline" onClick={() => setIsCreateOpen(true)}>
+                  + Registrar despesa de hoje
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700 dark:text-gray-200">
+                <div>
+                  <h3 className="font-semibold mb-2">Contas a vencer nos próximos 7 dias</h3>
+                  {upcomingTransactions.filter(tx => tx.type === "expense").length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400">Nenhuma conta a vencer nos próximos 7 dias.</p>
+                  ) : (
+                    <ul className="space-y-2">
+                      {upcomingTransactions
+                        .filter(tx => tx.type === "expense")
+                        .slice(0, 5)
+                        .map((tx) => {
+                          const amount = parseFloat(tx.amount || "0");
+                          const dateLabel = tx.dueDate || tx.date;
+                          return (
+                            <li key={tx.id} className="flex justify-between items-center">
+                              <div>
+                                <p className="font-medium">{tx.description}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Vencimento: {dateLabel?.substring(0, 10)}</p>
+                              </div>
+                              <span className="font-semibold">R$ {amount.toFixed(2)}</span>
+                            </li>
+                          );
+                        })}
+                    </ul>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-2">Resumo da última semana</h3>
+                  {lastWeekTransactions.length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400">Nenhum lançamento nos últimos 7 dias.</p>
+                  ) : (
+                    (() => {
+                      const income = lastWeekTransactions
+                        .filter(tx => tx.type === "income")
+                        .reduce((sum, tx) => sum + parseFloat(tx.amount || "0"), 0);
+                      const expenses = lastWeekTransactions
+                        .filter(tx => tx.type === "expense")
+                        .reduce((sum, tx) => sum + parseFloat(tx.amount || "0"), 0);
+                      return (
+                        <div className="space-y-1">
+                          <p>Você recebeu <span className="font-semibold text-green-600">R$ {income.toFixed(2)}</span>.</p>
+                          <p>Você gastou <span className="font-semibold text-red-600">R$ {expenses.toFixed(2)}</span>.</p>
+                        </div>
+                      );
+                    })()
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Top sections grid: incomes and expenses categories */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
