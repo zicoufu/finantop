@@ -191,21 +191,21 @@ export default function Dashboard() {
           })
         }
       />
-      <main className="flex-1 flex flex-col h-full">
+      <main className="flex-1 flex flex-col h-full bg-[#050509]">
 
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+        <header className="bg-[#050509] border-b border-[#262626] px-6 py-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">Painel Financeiro</h2>
-              <p className="text-xs text-gray-500 mt-1">
+              <h2 className="text-2xl font-bold text-white">Painel Financeiro</h2>
+              <p className="text-xs text-gray-400 mt-1">
                 Visão geral rápida do seu saldo, entradas e despesas no período selecionado.
               </p>
             </div>
 
             <div className="flex items-center gap-3">
               <Select value={period} onValueChange={setPeriod}>
-                <SelectTrigger className="w-40 h-9 text-sm border-gray-200">
+                <SelectTrigger className="w-40 h-9 text-sm border-[#262626] bg-[#020617] text-gray-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -218,7 +218,7 @@ export default function Dashboard() {
 
               <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogTrigger asChild>
-                  <Button className="h-9 bg-primary hover:bg-primary/90 text-sm font-medium px-4">
+                  <Button className="h-9 bg-orange-500 hover:bg-orange-500/90 text-sm font-medium px-4 shadow-[0_0_18px_rgba(249,115,22,0.7)]">
                     <Plus className="h-4 w-4 mr-2" />
                     {t('transactions.newTransaction')}
                   </Button>
@@ -242,8 +242,8 @@ export default function Dashboard() {
         </header>
 
         {/* Dashboard Content */}
-        <div className="p-6 space-y-6 overflow-y-auto flex-1">
-          <div className="mb-2 text-sm text-gray-500">
+        <div className="p-6 space-y-6 overflow-y-auto flex-1 bg-[#050509]">
+          <div className="mb-2 text-sm text-gray-400">
             {getPeriodLabel()}
             {reportsSummary && (!reportsSummary.hasData || ((reportsSummary.expensesByCategory?.length ?? 0) === 0 && (reportsSummary.balanceEvolution?.length ?? 0) === 0)) && (
               <span className="italic"> — não houve lançamentos de rendas e despesas.</span>
@@ -254,21 +254,26 @@ export default function Dashboard() {
 
           {/* Tarefas de hoje / visão rápida */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3">
+            <div className="bg-[#020617] p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-[#1f2937] lg:col-span-3">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Tarefas de hoje</h2>
-                <Button size="sm" variant="outline" onClick={() => setIsCreateOpen(true)}>
+                <h2 className="text-lg font-semibold text-gray-100">Tarefas de hoje</h2>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-[#374151] bg-transparent text-gray-200 hover:bg-[#111827] hover:text-white"
+                  onClick={() => setIsCreateOpen(true)}
+                >
                   + Registrar despesa de hoje
                 </Button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700 dark:text-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-300">
                 <div>
                   <h3 className="font-semibold mb-2">
                     Contas entre {formatDatePtBr(upcomingStart)} e {formatDatePtBr(upcomingEnd)}
                   </h3>
                   {upcomingTransactionsInRange.filter((tx: Transaction) => tx.type === "expense").length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400">Nenhuma conta a vencer nos próximos 7 dias.</p>
+                    <p className="text-gray-500">Nenhuma conta a vencer nos próximos 7 dias.</p>
                   ) : (
                     <ul className="space-y-2">
                       {upcomingTransactionsInRange
@@ -283,8 +288,8 @@ export default function Dashboard() {
                           return (
                             <li key={tx.id} className="flex justify-between items-center">
                               <div>
-                                <p className="font-medium">{tx.description}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Vencimento: {dateLabel}</p>
+                                <p className="font-medium text-gray-100">{tx.description}</p>
+                                <p className="text-xs text-gray-500">Vencimento: {dateLabel}</p>
                               </div>
                               <span className="font-semibold">R$ {amount.toFixed(2)}</span>
                             </li>
@@ -299,7 +304,7 @@ export default function Dashboard() {
                     Resumo da semana até {formatDatePtBr(weekEnd)}
                   </h3>
                   {lastWeekTransactions.length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400">Nenhum lançamento nos últimos 7 dias.</p>
+                    <p className="text-gray-500">Nenhum lançamento nos últimos 7 dias.</p>
                   ) : (
                     (() => {
                       const income = lastWeekTransactions
@@ -310,8 +315,8 @@ export default function Dashboard() {
                         .reduce((sum, tx) => sum + parseFloat(tx.amount || "0"), 0);
                       return (
                         <div className="space-y-1">
-                          <p>Você recebeu <span className="font-semibold text-green-600">R$ {income.toFixed(2)}</span>.</p>
-                          <p>Você gastou <span className="font-semibold text-red-600">R$ {expenses.toFixed(2)}</span>.</p>
+                          <p className="text-gray-300">Você recebeu <span className="font-semibold text-emerald-400">R$ {income.toFixed(2)}</span>.</p>
+                          <p className="text-gray-300">Você gastou <span className="font-semibold text-rose-400">R$ {expenses.toFixed(2)}</span>.</p>
                         </div>
                       );
                     })()
@@ -332,13 +337,13 @@ export default function Dashboard() {
             <BalanceChart filters={filters} />
             <div className="flex flex-col gap-6">
               {/* Minhas Contas */}
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800">
+              <div className="bg-[#020617] p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-[#1f2937]">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Minhas Contas</h3>
-                  <span className="text-xs text-primary font-medium cursor-default">Resumo</span>
+                  <h3 className="text-lg font-semibold text-gray-100">Minhas Contas</h3>
+                  <span className="text-xs text-orange-400 font-medium cursor-default">Resumo</span>
                 </div>
                 {accounts.length === 0 ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-500">
                     Nenhuma conta cadastrada ainda.
                   </p>
                 ) : (
@@ -346,13 +351,13 @@ export default function Dashboard() {
                     {accounts.map((acc) => (
                       <div
                         key={acc.id}
-                        className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700"
+                        className="flex items-center justify-between p-3 rounded-xl bg-[#020617] border border-[#374151]"
                       >
                         <div>
-                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{acc.name}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Saldo</p>
+                          <p className="text-sm font-semibold text-gray-100">{acc.name}</p>
+                          <p className="text-xs text-gray-500">Saldo</p>
                         </div>
-                        <span className="text-sm font-bold text-gray-900 dark:text-gray-50">
+                        <span className="text-sm font-bold text-gray-100">
                           {formatCurrency(parseFloat(acc.balance || "0"))}
                         </span>
                       </div>
@@ -362,10 +367,10 @@ export default function Dashboard() {
               </div>
 
               {/* Resumo da Semana (widget lateral) */}
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 flex-1">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Resumo da Semana</h3>
+              <div className="bg-[#020617] p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-[#1f2937] flex-1">
+                <h3 className="text-lg font-semibold text-gray-100 mb-4">Resumo da Semana</h3>
                 {lastWeekTransactions.length === 0 ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-500">
                     Nenhum lançamento no intervalo recente.
                   </p>
                 ) : (
@@ -374,7 +379,7 @@ export default function Dashboard() {
                       <div className="mt-1 mr-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
                       </div>
-                      <p className="text-gray-700 dark:text-gray-200">
+                      <p className="text-gray-300">
                         Você recebeu
                         {" "}
                         <span className="font-semibold text-emerald-600 dark:text-emerald-400">
