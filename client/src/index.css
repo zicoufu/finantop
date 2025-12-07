@@ -148,4 +148,14 @@
   .text-danger {
     color: hsl(var(--danger));
   }
+
+  /* Dark dashboard surfaces (mock theme) */
+  .bg-dark-surface {
+    /* fundo levemente mais claro que o preto absoluto, próximo ao mock */
+    background-color: #0b0b12;
+  }
+
+  .border-dark-border {
+    border-color: #262626;
+  }
 }
