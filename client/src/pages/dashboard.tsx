@@ -254,7 +254,7 @@ export default function Dashboard() {
 
           {/* Tarefas de hoje / visão rápida */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="bg-[#020617] p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-[#1f2937] lg:col-span-3">
+            <div className="bg-dark-surface p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-dark-border lg:col-span-3">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-100">Tarefas de hoje</h2>
                 <Button
@@ -337,7 +337,7 @@ export default function Dashboard() {
             <BalanceChart filters={filters} />
             <div className="flex flex-col gap-6">
               {/* Minhas Contas */}
-              <div className="bg-[#020617] p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-[#1f2937]">
+              <div className="bg-dark-surface p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-dark-border">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold text-gray-100">Minhas Contas</h3>
                   <span className="text-xs text-orange-400 font-medium cursor-default">Resumo</span>
@@ -351,7 +351,7 @@ export default function Dashboard() {
                     {accounts.map((acc) => (
                       <div
                         key={acc.id}
-                        className="flex items-center justify-between p-3 rounded-xl bg-[#020617] border border-[#374151]"
+                        className="flex items-center justify-between p-3 rounded-xl bg-dark-surface border border-dark-border/70"
                       >
                         <div>
                           <p className="text-sm font-semibold text-gray-100">{acc.name}</p>
@@ -367,7 +367,7 @@ export default function Dashboard() {
               </div>
 
               {/* Resumo da Semana (widget lateral) */}
-              <div className="bg-[#020617] p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-[#1f2937] flex-1">
+              <div className="bg-dark-surface p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-dark-border flex-1">
                 <h3 className="text-lg font-semibold text-gray-100 mb-4">Resumo da Semana</h3>
                 {lastWeekTransactions.length === 0 ? (
                   <p className="text-sm text-gray-500">
