@@ -34,16 +34,16 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 5 }, (_, i) => (currentYear - 2 + i).toString());
   return (
-    <aside className="w-80 flex-shrink-0 bg-white dark:bg-gray-900 p-6 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto">
-      <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-800 rounded-lg mb-6 text-sm text-gray-600 dark:text-gray-300">
+    <aside className="w-80 flex-shrink-0 bg-dark-surface p-6 border-r border-dark-border h-full overflow-y-auto">
+      <div className="flex items-center justify-between p-3 bg-[#111827] rounded-lg mb-6 text-sm text-gray-300">
         <span>Filtros do painel</span>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 text-gray-200">
         <div>
-          <label htmlFor="filter-account" className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Conta</label>
+          <label htmlFor="filter-account" className="block text-sm font-medium text-gray-400 mb-1">Conta</label>
           <Select>
-            <SelectTrigger id="filter-account" aria-label="Conta">
+            <SelectTrigger id="filter-account" aria-label="Conta" className="bg-[#020617] border-dark-border text-gray-100">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
@@ -52,20 +52,20 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
           </Select>
         </div>
 
-        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className="flex items-center text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">
+        <div className="p-4 bg-[#020617] rounded-lg border border-dark-border/70">
+          <div className="flex items-center text-sm font-semibold text-gray-400 mb-3">
             <span>Contas bancárias</span>
           </div>
           {isLoadingAccounts ? (
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-gray-500">
               Carregando contas...
             </div>
           ) : !accounts || accounts.length === 0 ? (
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-gray-500">
               Nenhuma conta cadastrada ainda.
             </div>
           ) : (
-            <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+            <ul className="space-y-2 text-sm text-gray-100">
               {accounts.map((account) => {
                 const numericBalance = typeof account.balance === "string" ? Number(account.balance) : account.balance;
                 const isPositive = numericBalance >= 0;
@@ -86,14 +86,14 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Período</label>
+          <label className="block text-sm font-medium text-gray-400 mb-1">Período</label>
           <div className="flex space-x-2">
             <div className="relative w-1/2">
               <input
                 id="period-start"
                 aria-label="Data inicial"
                 placeholder="dd/mm/aaaa"
-                className="w-full pl-3 pr-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md text-sm h-9"
+                className="w-full pl-3 pr-8 bg-[#020617] border border-dark-border rounded-md text-sm h-9 text-gray-100 placeholder:text-gray-500"
                 type="text"
                 value={filters.startDate}
                 onChange={(e) => onFiltersChange({ ...filters, startDate: e.target.value })}
@@ -105,7 +105,7 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
                 id="period-end"
                 aria-label="Data final"
                 placeholder="dd/mm/aaaa"
-                className="w-full pl-3 pr-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md text-sm h-9"
+                className="w-full pl-3 pr-8 bg-[#020617] border border-dark-border rounded-md text-sm h-9 text-gray-100 placeholder:text-gray-500"
                 type="text"
                 value={filters.endDate}
                 onChange={(e) => onFiltersChange({ ...filters, endDate: e.target.value })}
@@ -116,13 +116,13 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
         </div>
 
         <div>
-          <label htmlFor="filter-year" className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Ano</label>
+          <label htmlFor="filter-year" className="block text-sm font-medium text-gray-400 mb-1">Ano</label>
           <input
             id="filter-year"
             type="number"
             min="1900"
             max="2100"
-            className="w-full pl-3 pr-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md text-sm h-9"
+            className="w-full pl-3 pr-3 bg-[#020617] border border-dark-border rounded-md text-sm h-9 text-gray-100 placeholder:text-gray-500"
             placeholder="Ex: 2025"
             value={filters.year}
             onChange={(e) => onFiltersChange({ ...filters, year: e.target.value })}
@@ -130,12 +130,12 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
         </div>
 
         <div>
-          <label htmlFor="filter-month" className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Mês</label>
+          <label htmlFor="filter-month" className="block text-sm font-medium text-gray-400 mb-1">Mês</label>
           <Select
             value={filters.month}
             onValueChange={(value) => onFiltersChange({ ...filters, month: value })}
           >
-            <SelectTrigger id="filter-month" aria-label="Mês">
+            <SelectTrigger id="filter-month" aria-label="Mês" className="bg-[#020617] border border-dark-border text-gray-100">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
@@ -158,7 +158,7 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
 
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full border-dark-border text-gray-200 hover:bg-[#111827]"
           onClick={onResetFilters}
         >
           Limpar filtros
@@ -167,4 +167,3 @@ export default function SidebarFilters({ filters, onFiltersChange, onResetFilter
     </aside>
   );
 }
-

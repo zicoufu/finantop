@@ -24,7 +24,7 @@ export default function KPIHero() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       {/* Saldo total */}
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:border-orange-500/30 transition-all duration-300">
+      <div className="bg-dark-surface p-6 rounded-2xl shadow-lg border border-dark-border relative overflow-hidden group hover:border-orange-500/40 transition-all duration-300">
         <div className="absolute -right-10 -top-10 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl group-hover:bg-orange-500/20 transition-all" />
         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
           <Wallet className="w-16 h-16 text-orange-500" />
@@ -32,7 +32,7 @@ export default function KPIHero() {
         <div className="flex justify-between items-start mb-4 relative z-10">
           <div>
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Total</p>
-            <p className="mt-1 text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+            <p className="mt-1 text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">
               {isLoading ? "..." : formatCurrency(currentBalance)}
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function KPIHero() {
       </div>
 
       {/* Entradas */}
-      <div className="relative bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm col-span-1 overflow-hidden">
+      <div className="relative bg-dark-surface p-6 rounded-2xl border border-dark-border shadow-sm col-span-1 overflow-hidden">
         <div className="absolute -top-6 -right-4 w-16 h-16 bg-emerald-500/10 rounded-full" />
         <div className="flex justify-between items-start mb-3 relative">
           <div>
@@ -67,7 +67,7 @@ export default function KPIHero() {
       </div>
 
       {/* Despesas */}
-      <div className="relative bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm col-span-1 overflow-hidden">
+      <div className="relative bg-dark-surface p-6 rounded-2xl border border-dark-border shadow-sm col-span-1 overflow-hidden">
         <div className="absolute -top-6 -right-4 w-16 h-16 bg-rose-500/10 rounded-full" />
         <div className="flex justify-between items-start mb-3 relative">
           <div>
