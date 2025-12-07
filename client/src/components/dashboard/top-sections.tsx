@@ -151,7 +151,7 @@ export function CategoryKPIsGrid({ items, isLoading, isError }: CategoryKPIsGrid
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="bg-dark-surface p-6 rounded-2xl shadow-sm border border-dark-border lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="flex items-center space-x-4 animate-pulse">
             <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg w-10 h-10" />
@@ -167,14 +167,14 @@ export function CategoryKPIsGrid({ items, isLoading, isError }: CategoryKPIsGrid
 
   if (isError || !topItems.length) {
     return (
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3 text-sm text-gray-500 dark:text-gray-400">
+      <div className="bg-dark-surface p-6 rounded-2xl shadow-sm border border-dark-border lg:col-span-3 text-sm text-gray-500 dark:text-gray-400">
         Sem dados suficientes de despesas por categoria neste período.
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div className="bg-dark-surface p-6 rounded-2xl shadow-sm border border-dark-border lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
       {topItems.map((cat, idx) => (
         <div key={cat.name} className="flex items-center space-x-4">
           <div className={`p-3 rounded-lg ${palette[idx % palette.length]}`}>

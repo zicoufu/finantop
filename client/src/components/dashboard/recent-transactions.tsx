@@ -64,7 +64,7 @@ export default function RecentTransactions({ filters }: RecentTransactionsProps)
 
   if (isLoading) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader className="flex items-center justify-between pb-6">
           <CardTitle className="text-lg font-semibold text-gray-800">
             {t('dashboard.recentTransactions')}
@@ -120,7 +120,7 @@ export default function RecentTransactions({ filters }: RecentTransactionsProps)
 
   if (!transactions || !categories) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader>
           <CardTitle>{t('dashboard.recentTransactions')}</CardTitle>
         </CardHeader>
@@ -289,7 +289,7 @@ export default function RecentTransactions({ filters }: RecentTransactionsProps)
   };
 
   return (
-    <Card className="bg-white shadow-sm border border-gray-200">
+    <Card className="bg-dark-surface shadow-sm border border-dark-border">
       <CardHeader className="flex items-center justify-between pb-6">
         <CardTitle className="text-lg font-semibold text-gray-800">
           {t('dashboard.recentTransactions')}
