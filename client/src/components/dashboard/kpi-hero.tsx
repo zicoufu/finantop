@@ -32,7 +32,7 @@ export default function KPIHero() {
         <div className="flex justify-between items-start mb-4 relative z-10">
           <div>
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Total</p>
-            <p className="mt-1 text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+            <p className="mt-1 text-2xl lg:text-3xl font-bold text-white">
               {isLoading ? "..." : formatCurrency(currentBalance)}
             </p>
           </div>
@@ -52,7 +52,7 @@ export default function KPIHero() {
         <div className="flex justify-between items-start mb-3 relative">
           <div>
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Entradas</p>
-            <p className="mt-1 text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+            <p className="mt-1 text-2xl lg:text-3xl font-bold text-white">
               {isLoading ? "..." : formatCurrency(monthlyIncome)}
             </p>
           </div>
@@ -72,7 +72,7 @@ export default function KPIHero() {
         <div className="flex justify-between items-start mb-3 relative">
           <div>
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Despesas</p>
-            <p className="mt-1 text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+            <p className="mt-1 text-2xl lg:text-3xl font-bold text-white">
               {isLoading ? "..." : formatCurrency(monthlyExpenses)}
             </p>
           </div>
