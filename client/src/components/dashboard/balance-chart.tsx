@@ -89,7 +89,7 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
 
   if (isLoading) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader className="flex flex-row items-center justify-between pb-6">
           <CardTitle className="text-lg font-semibold text-gray-800">
             {t('dashboard.balanceEvolution')}
@@ -106,7 +106,7 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
   
   if (isError) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader>
           <CardTitle>{t('dashboard.balanceEvolution')}</CardTitle>
         </CardHeader>
@@ -122,7 +122,7 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
 
   if (!chartData || !chartData.hasData || chartData.balanceEvolution.length === 0) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader>
           <CardTitle>{t('dashboard.balanceEvolution')}</CardTitle>
         </CardHeader>
@@ -296,7 +296,7 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
   };
 
   return (
-    <Card className="bg-white shadow-sm border border-gray-200">
+    <Card className="bg-dark-surface shadow-sm border border-dark-border">
       <CardHeader className="flex flex-row items-center justify-between pb-6">
         <CardTitle className="text-lg font-semibold text-gray-800">
           {t('dashboard.balanceEvolution')}

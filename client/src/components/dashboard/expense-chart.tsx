@@ -77,7 +77,7 @@ export default function ExpenseChart({ filters }: ExpenseChartProps) {
 
   if (isLoading) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader className="flex flex-row items-center justify-between pb-6">
           <CardTitle className="text-lg font-semibold text-gray-800">
             {t('dashboard.expensesByCategory')}
@@ -94,7 +94,7 @@ export default function ExpenseChart({ filters }: ExpenseChartProps) {
   
   if (isError) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader>
           <CardTitle>{t('dashboard.expensesByCategory')}</CardTitle>
         </CardHeader>
@@ -110,7 +110,7 @@ export default function ExpenseChart({ filters }: ExpenseChartProps) {
 
   if (!chartData || !chartData.hasData || chartData.expensesByCategory.length === 0) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader>
           <CardTitle>{t('dashboard.expensesByCategory')}</CardTitle>
         </CardHeader>
@@ -194,7 +194,7 @@ export default function ExpenseChart({ filters }: ExpenseChartProps) {
   };
 
   return (
-    <Card className="bg-white shadow-sm border border-gray-200">
+    <Card className="bg-dark-surface shadow-sm border border-dark-border">
       <CardHeader className="flex flex-row items-center justify-between pb-6">
         <CardTitle className="text-lg font-semibold text-gray-800">
           Onde você está gastando mais
@@ -231,7 +231,6 @@ export default function ExpenseChart({ filters }: ExpenseChartProps) {
                       <div className="flex items-center">
                         <span
                           className="w-3 h-3 rounded-full mr-2 shadow-sm"
-                          style={{ backgroundColor: color, boxShadow: `${color}40 0 0 8px` }}
                         />
                         <div className="flex flex-col">
                           <span className="text-xs font-semibold text-gray-700 dark:text-gray-100">
