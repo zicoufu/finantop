@@ -41,7 +41,7 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        "bg-white dark:bg-gray-900 shadow-lg border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ease-in-out flex flex-col h-screen overflow-y-auto",
+        "bg-[#050509] text-gray-200 border-r border-[#262626] transition-all duration-300 ease-in-out flex flex-col h-screen overflow-y-auto",
         isCollapsed ? "w-16" : "w-64"
       )}
     >
@@ -49,19 +49,19 @@ export default function Sidebar() {
       <div className="p-6 flex items-center justify-between">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-orange-500 to-orange-400 shadow-[0_0_18px_rgba(249,115,22,0.7)]">
               <TrendingUp className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-800 dark:text-white">{t('app.title')}</h1>
+            <h1 className="text-xl font-bold text-white">{t('app.title')}</h1>
           </div>
         )}
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="h-8 w-8 p-0 dark:text-white"
+          className="h-8 w-8 p-0 text-gray-300 hover:bg-[#111827] hover:text-white"
         >
-          {isCollapsed ? <Menu className="h-4 w-4 dark:text-white" /> : <ChevronLeft className="h-4 w-4 dark:text-white" />}
+          {isCollapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
       </div>
 
@@ -76,17 +76,17 @@ export default function Sidebar() {
               <li key={item.name}>
                 <Link to={item.href}>
                   <Button
-                    variant={isActive ? "default" : "ghost"}
+                    variant="ghost"
                     className={cn(
-                      "w-full justify-start",
+                      "w-full justify-start text-sm font-medium",
                       isCollapsed ? "px-2" : "px-4",
-                      isActive 
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                        : "hover:bg-gray-50 dark:hover:bg-gray-800 dark:text-white"
+                      isActive
+                        ? "bg-[#111827] text-white border border-orange-500/60 shadow-[0_0_12px_rgba(249,115,22,0.4)]"
+                        : "text-gray-300 hover:bg-[#111827] hover:text-white"
                     )}
                   >
-                    <Icon className={cn("h-5 w-5 text-gray-700 dark:text-white", isCollapsed ? "" : "mr-3")} />
-                    {!isCollapsed && <span className="text-gray-700 dark:text-white">{item.name}</span>}
+                    <Icon className={cn("h-5 w-5", isCollapsed ? "" : "mr-3")} />
+                    {!isCollapsed && <span>{item.name}</span>}
                   </Button>
                 </Link>
               </li>

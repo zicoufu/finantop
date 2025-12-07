@@ -34,10 +34,10 @@ import { AuthInitializer } from "@/components/auth-initializer";
 
 // Layout principal para as rotas protegidas
 const MainLayout = () => (
-  <div className="flex min-h-screen bg-gray-50 dark:bg-background">
+  <div className="flex min-h-screen bg-[#050509] text-gray-100">
     <Sidebar />
     <main className="flex-1 overflow-auto">
-      <div className="flex justify-end items-center p-2 bg-white shadow-sm">
+      <div className="flex justify-end items-center p-2 bg-transparent">
         <LanguageReloader />
       </div>
       <div className="p-6">
