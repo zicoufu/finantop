@@ -151,8 +151,8 @@
 
   /* Dark dashboard surfaces (mock theme) */
   .bg-dark-surface {
-    /* fundo levemente mais claro que o preto absoluto, próximo ao mock */
-    background-color: #0b0b12;
+    /* fundo levemente mais claro que o fundo global, em tom dark mais quente próximo ao mock */
+    background-color: #141015;
   }
 
   .border-dark-border {
