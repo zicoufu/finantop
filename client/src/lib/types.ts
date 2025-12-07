@@ -11,7 +11,15 @@ export interface Transaction {
   date: string;
   dueDate?: string;
   status: string;
+  type?: string;
   categoryId: number;
   isRecurring: boolean;
   expenseType?: string;
+}
+
+export interface Account {
+  id: number;
+  name: string;
+  balance: string;
+  type?: string;
 }

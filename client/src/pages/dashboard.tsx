@@ -6,8 +6,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus } from "lucide-react";
 import ExpenseForm from "@/components/forms/expense-form";
 import RecentTransactions from "@/components/dashboard/recent-transactions";
-import { Category, Transaction } from "@/lib/types";
+import { Category, Transaction, Account } from "@/lib/types";
 import { api } from "@/lib/api";
+import { formatCurrency } from "@/lib/currency";
 import { useTranslation } from "react-i18next";
 import SidebarFilters from "@/components/dashboard/sidebar-filters";
 import KPIHero from "@/components/dashboard/kpi-hero";
@@ -31,22 +32,86 @@ export default function Dashboard() {
     queryFn: () => api("/api/categories?type=expense"),
   });
 
+  const { data: accounts = [] } = useQuery<Account[]>({
+    queryKey: ["accounts"],
+    queryFn: () => api("/api/accounts"),
+  });
+  
+  // ==========================
   // Tarefas de hoje / visão rápida da semana
-  const today = new Date();
-  const endIso = today.toISOString().split("T")[0];
-  const startForWeek = new Date(today);
-  startForWeek.setDate(startForWeek.getDate() - 6);
-  const startIso = startForWeek.toISOString().split("T")[0];
+  // Agora respeitando os filtros do dashboard (opção B)
+  // ==========================
 
-  const { data: upcomingTransactions = [] } = useQuery<Transaction[]>({
-    queryKey: ["transactions", "upcoming", 7],
-    queryFn: () => api("/api/transactions?upcoming=7"),
+  const parsePtBrDateToDate = (value: string) => {
+    if (!value) return null;
+    const [day, month, year] = value.split("/");
+    if (!day || !month || !year) return null;
+    return new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+  };
+
+  const computeReferenceDate = () => {
+    const { startDate, endDate, year, month } = filters;
+
+    const end = parsePtBrDateToDate(endDate);
+    if (end) return end;
+
+    const start = parsePtBrDateToDate(startDate);
+    if (start) return start;
+
+    if (year && month && month !== "all") {
+      const y = parseInt(year, 10);
+      const m = parseInt(month, 10) - 1;
+      // Último dia do mês filtrado
+      return new Date(y, m + 1, 0);
+    }
+
+    if (year) {
+      const y = parseInt(year, 10);
+      // Último dia do ano filtrado
+      return new Date(y, 11, 31);
+    }
+
+    // Fallback: hoje
+    return new Date();
+  };
+
+  const referenceDate = computeReferenceDate();
+
+  // Últimos 7 dias em relação à data de referência
+  const weekEnd = new Date(referenceDate);
+  const weekStart = new Date(referenceDate);
+  weekStart.setDate(weekStart.getDate() - 6);
+
+  const weekEndIso = weekEnd.toISOString().split("T")[0];
+  const weekStartIso = weekStart.toISOString().split("T")[0];
+
+  // Próximos 7 dias em relação à data de referência
+  const upcomingStart = new Date(referenceDate);
+  const upcomingEnd = new Date(referenceDate);
+  upcomingEnd.setDate(upcomingEnd.getDate() + 7);
+
+  const upcomingStartIso = upcomingStart.toISOString().split("T")[0];
+  const upcomingEndIso = upcomingEnd.toISOString().split("T")[0];
+
+  const { data: upcomingTransactionsInRange = [] } = useQuery<Transaction[]>({
+    queryKey: ["transactions", "upcoming-range", upcomingStartIso, upcomingEndIso],
+    queryFn: () => api(`/api/transactions?startDate=${upcomingStartIso}&endDate=${upcomingEndIso}`),
   });
 
   const { data: lastWeekTransactions = [] } = useQuery<Transaction[]>({
-    queryKey: ["transactions", "last-week", startIso, endIso],
-    queryFn: () => api(`/api/transactions?startDate=${startIso}&endDate=${endIso}`),
+    queryKey: ["transactions", "last-week", weekStartIso, weekEndIso],
+    queryFn: () => api(`/api/transactions?startDate=${weekStartIso}&endDate=${weekEndIso}`),
   });
+
+  const formatDatePtBr = (d: Date) => d.toLocaleDateString("pt-BR");
+
+  const lastWeekIncome = lastWeekTransactions
+    .filter((tx: Transaction) => tx.type === "income")
+    .reduce((sum, tx) => sum + parseFloat(tx.amount || "0"), 0);
+
+  const lastWeekExpenses = lastWeekTransactions
+    .filter((tx: Transaction) => tx.type === "expense")
+    .reduce((sum, tx) => sum + parseFloat(tx.amount || "0"), 0);
 
   const buildReportsQueryUrl = () => {
     const params = new URLSearchParams();
@@ -127,16 +192,20 @@ export default function Dashboard() {
         }
       />
       <main className="flex-1 flex flex-col h-full">
+
         {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <h2 className="text-2xl font-bold text-gray-800">{t('dashboard.title')}</h2>
+        <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">Painel Financeiro</h2>
+              <p className="text-xs text-gray-500 mt-1">
+                Visão geral rápida do seu saldo, entradas e despesas no período selecionado.
+              </p>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-3">
               <Select value={period} onValueChange={setPeriod}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40 h-9 text-sm border-gray-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -149,7 +218,7 @@ export default function Dashboard() {
 
               <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-primary hover:bg-primary/90">
+                  <Button className="h-9 bg-primary hover:bg-primary/90 text-sm font-medium px-4">
                     <Plus className="h-4 w-4 mr-2" />
                     {t('transactions.newTransaction')}
                   </Button>
@@ -195,15 +264,17 @@ export default function Dashboard() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700 dark:text-gray-200">
                 <div>
-                  <h3 className="font-semibold mb-2">Contas a vencer nos próximos 7 dias</h3>
-                  {upcomingTransactions.filter(tx => tx.type === "expense").length === 0 ? (
+                  <h3 className="font-semibold mb-2">
+                    Contas entre {formatDatePtBr(upcomingStart)} e {formatDatePtBr(upcomingEnd)}
+                  </h3>
+                  {upcomingTransactionsInRange.filter((tx: Transaction) => tx.type === "expense").length === 0 ? (
                     <p className="text-gray-500 dark:text-gray-400">Nenhuma conta a vencer nos próximos 7 dias.</p>
                   ) : (
                     <ul className="space-y-2">
-                      {upcomingTransactions
-                        .filter(tx => tx.type === "expense")
+                      {upcomingTransactionsInRange
+                        .filter((tx: Transaction) => tx.type === "expense")
                         .slice(0, 5)
-                        .map((tx) => {
+                        .map((tx: Transaction) => {
                           const amount = parseFloat(tx.amount || "0");
                           const rawDate = tx.dueDate || tx.date;
                           const dateLabel = rawDate
@@ -224,7 +295,9 @@ export default function Dashboard() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold mb-2">Resumo da última semana</h3>
+                  <h3 className="font-semibold mb-2">
+                    Resumo da semana até {formatDatePtBr(weekEnd)}
+                  </h3>
                   {lastWeekTransactions.length === 0 ? (
                     <p className="text-gray-500 dark:text-gray-400">Nenhum lançamento nos últimos 7 dias.</p>
                   ) : (
@@ -254,9 +327,81 @@ export default function Dashboard() {
             <ExpenseChart filters={filters} />
           </div>
 
-          {/* Evolution monthly combined chart */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Evolution monthly combined chart + right widgets */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             <BalanceChart filters={filters} />
+            <div className="flex flex-col gap-6">
+              {/* Minhas Contas */}
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Minhas Contas</h3>
+                  <span className="text-xs text-primary font-medium cursor-default">Resumo</span>
+                </div>
+                {accounts.length === 0 ? (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Nenhuma conta cadastrada ainda.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {accounts.map((acc) => (
+                      <div
+                        key={acc.id}
+                        className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700"
+                      >
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{acc.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Saldo</p>
+                        </div>
+                        <span className="text-sm font-bold text-gray-900 dark:text-gray-50">
+                          {formatCurrency(parseFloat(acc.balance || "0"))}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Resumo da Semana (widget lateral) */}
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 flex-1">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Resumo da Semana</h3>
+                {lastWeekTransactions.length === 0 ? (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Nenhum lançamento no intervalo recente.
+                  </p>
+                ) : (
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-start">
+                      <div className="mt-1 mr-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-200">
+                        Você recebeu
+                        {" "}
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                          {formatCurrency(lastWeekIncome)}
+                        </span>
+                        {" "}
+                        no período.
+                      </p>
+                    </div>
+                    <div className="flex items-start">
+                      <div className="mt-1 mr-2">
+                        <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" />
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-200">
+                        Você gastou
+                        {" "}
+                        <span className="font-semibold text-rose-600 dark:text-rose-400">
+                          {formatCurrency(lastWeekExpenses)}
+                        </span>
+                        {" "}
+                        no período.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Category KPI mini-cards grid */}
