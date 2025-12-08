@@ -326,9 +326,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Top sections grid: incomes and expenses categories */}
+          {/* Top sections grid: fluxo de caixa + despesas por categoria */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <TopIncomeCategories filters={filters} />
+            <BalanceChart filters={filters} />
             <ExpenseChart filters={filters} />
           </div>
 
