@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, ArrowPath } from "lucide-react";
+import { Plus, RotateCcw } from "lucide-react";
 import ExpenseForm from "@/components/forms/expense-form";
 import RecentTransactions from "@/components/dashboard/recent-transactions";
 import { Category, Transaction, Account } from "@/lib/types";
@@ -195,7 +195,7 @@ export default function Dashboard() {
       <main className="flex-1 flex flex-col h-full bg-[#050509]">
 
         {/* Header */}
-        <header className="bg-[#050509] border-b border-[#262626] px-6 py-4">
+        <header className="bg-[#050509] border-b border-[#262626] px-6 pt-3 pb-2">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold text-white">Painel Financeiro</h2>
@@ -244,7 +244,7 @@ export default function Dashboard() {
                 className="h-9 px-4 border-[#374151] bg-transparent text-gray-200 hover:bg-[#111827] hover:text-white flex items-center gap-2"
                 onClick={() => queryClient.invalidateQueries()}
               >
-                <ArrowPath className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4" />
                 Atualizar
               </Button>
             </div>
