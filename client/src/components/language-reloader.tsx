@@ -27,12 +27,11 @@ export function LanguageReloader() {
     <Button 
       variant="outline" 
       size="sm" 
-      className="ml-2" 
+      className="ml-2 h-8 w-8 p-0 flex items-center justify-center" 
       onClick={handleReloadTranslations} 
       title="Recarregar traduções"
     >
-      <RefreshCcw className="h-4 w-4 mr-1" />
-      {t('common.reloadTranslations', 'Atualizar')}
+      <RefreshCcw className="h-4 w-4" />
     </Button>
   );
 }
