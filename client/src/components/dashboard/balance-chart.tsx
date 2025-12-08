@@ -92,7 +92,7 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
       <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader className="flex flex-row items-center justify-between pb-6">
           <CardTitle className="text-lg font-semibold text-gray-800">
-            {t('dashboard.balanceEvolution')}
+            Fluxo de Caixa
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -108,7 +108,7 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
     return (
       <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader>
-          <CardTitle>{t('dashboard.balanceEvolution')}</CardTitle>
+          <CardTitle>Fluxo de Caixa</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-64 flex items-center justify-center text-gray-500 flex-col">
@@ -124,7 +124,7 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
     return (
       <Card className="bg-dark-surface shadow-sm border border-dark-border">
         <CardHeader>
-          <CardTitle>{t('dashboard.balanceEvolution')}</CardTitle>
+          <CardTitle>Fluxo de Caixa</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-64 flex items-center justify-center text-gray-500">
@@ -199,7 +199,6 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
   };
   
   const months = balanceEvolution.map(item => translateMonth(item.month));
-  const balanceData = balanceEvolution.map(item => item.balance);
   const incomeData = balanceEvolution.map(item => item.income);
   const expenseData = balanceEvolution.map(item => item.expenses);
 
@@ -207,44 +206,28 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
     labels: months,
     datasets: [
       {
-        label: t('dashboard.charts.balance'),
-        data: balanceData,
-        borderColor: 'hsl(214, 84%, 56%)',
-        backgroundColor: 'hsla(214, 84%, 56%, 0.1)',
+        label: 'Entradas',
+        data: incomeData,
+        borderColor: 'rgba(16, 185, 129, 1)',
+        backgroundColor: 'rgba(16, 185, 129, 0.15)',
         borderWidth: 3,
         fill: true,
         tension: 0.4,
-        pointRadius: 6,
-        pointHoverRadius: 8,
-        pointBackgroundColor: 'hsl(214, 84%, 56%)',
-      },
-      {
-        label: t('dashboard.charts.income'),
-        data: incomeData,
-        borderColor: 'hsl(142, 76%, 36%)',
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        borderDash: [5, 5],
-        fill: false,
-        tension: 0.4,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: 'hsl(142, 76%, 36%)',
-        hidden: true,
+        pointBackgroundColor: 'rgba(16, 185, 129, 1)',
       },
       {
-        label: t('dashboard.charts.expenses'),
+        label: 'Saídas',
         data: expenseData,
-        borderColor: 'hsl(0, 84%, 60%)',
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        borderDash: [5, 5],
-        fill: false,
+        borderColor: 'rgba(248, 113, 113, 1)',
+        backgroundColor: 'rgba(248, 113, 113, 0.15)',
+        borderWidth: 3,
+        fill: true,
         tension: 0.4,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: 'hsl(0, 84%, 60%)',
-        hidden: true,
+        pointBackgroundColor: 'rgba(248, 113, 113, 1)',
       },
     ],
   };
@@ -254,24 +237,39 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: 'top' as const,
+        align: 'end' as const,
+        labels: {
+          usePointStyle: true,
+          color: '#e5e7eb',
+          font: {
+            family: 'Inter',
+            size: 11,
+          },
+        },
       },
       tooltip: {
+        mode: 'index' as const,
+        intersect: false,
         callbacks: {
-          label: function(context: any) {
-            // Usar formatCurrency para garantir consistência na formatação de moeda
-            const formattedValue = formatCurrency(context.parsed.y);
-            return `${t('common.balance')}: ${formattedValue}`;
+          label: function (context: any) {
+            const value = context.parsed.y;
+            const formattedValue = formatCurrency(value);
+            return `${context.dataset.label}: ${formattedValue}`;
           },
         },
       },
     },
+    interaction: {
+      mode: 'index' as const,
+      intersect: false,
+    },
     scales: {
       y: {
-        beginAtZero: false,
+        beginAtZero: true,
         ticks: {
-          callback: function(value: any) {
-            // Usar formatCurrency para garantir consistência na formatação de moeda
+          callback: function (value: any) {
             return formatCurrency(value);
           },
           font: {
@@ -279,7 +277,7 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
           },
         },
         grid: {
-          color: 'rgba(0, 0, 0, 0.05)',
+          color: 'rgba(148, 163, 184, 0.15)',
         },
       },
       x: {
@@ -299,7 +297,7 @@ export default function BalanceChart({ filters }: BalanceChartProps) {
     <Card className="bg-dark-surface shadow-sm border border-dark-border">
       <CardHeader className="flex flex-row items-center justify-between pb-6">
         <CardTitle className="text-lg font-semibold text-gray-800">
-          {t('dashboard.balanceEvolution')}
+          Fluxo de Caixa
         </CardTitle>
       </CardHeader>
       <CardContent>
