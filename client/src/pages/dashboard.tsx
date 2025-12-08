@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Plus, ArrowPath } from "lucide-react";
 import ExpenseForm from "@/components/forms/expense-form";
 import RecentTransactions from "@/components/dashboard/recent-transactions";
 import { Category, Transaction, Account } from "@/lib/types";
@@ -18,6 +18,7 @@ import BalanceChart from "@/components/dashboard/balance-chart";
 
 export default function Dashboard() {
   const [period, setPeriod] = useState("current-month");
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
@@ -237,6 +238,15 @@ export default function Dashboard() {
                   />
                 </DialogContent>
               </Dialog>
+
+              <Button
+                variant="outline"
+                className="h-9 px-4 border-[#374151] bg-transparent text-gray-200 hover:bg-[#111827] hover:text-white flex items-center gap-2"
+                onClick={() => queryClient.invalidateQueries()}
+              >
+                <ArrowPath className="h-4 w-4" />
+                Atualizar
+              </Button>
             </div>
           </div>
         </header>
