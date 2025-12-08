@@ -195,7 +195,7 @@ export default function Dashboard() {
       <main className="flex-1 flex flex-col h-full bg-[#050509]">
 
         {/* Header */}
-        <header className="bg-[#050509] border-b border-[#262626] px-6 pt-3 pb-2">
+        <header className="bg-[#050509] border-b border-[#262626] px-6 pt-2 pb-1">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold text-white">Painel Financeiro</h2>
