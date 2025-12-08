@@ -326,15 +326,19 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Top sections grid: fluxo de caixa + despesas por categoria */}
+          {/* Faixa principal: Fluxo de Caixa ocupando toda a largura */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <BalanceChart filters={filters} />
-            <ExpenseChart filters={filters} />
+            <div className="lg:col-span-3">
+              <BalanceChart filters={filters} />
+            </div>
           </div>
 
-          {/* Right widgets: contas e resumo da semana */}
+          {/* Linha inferior: donut de despesas x contas e resumo da semana */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-            <div className="flex flex-col gap-6 lg:col-start-3">
+            <div className="lg:col-span-2">
+              <ExpenseChart filters={filters} />
+            </div>
+            <div className="flex flex-col gap-6">
               {/* Minhas Contas */}
               <div className="bg-dark-surface p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-dark-border">
                 <div className="flex justify-between items-center mb-4">
