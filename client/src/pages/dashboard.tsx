@@ -338,13 +338,13 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Linha inferior: donut de despesas x resumo da semana (sem widget simples de contas) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-            <div className="lg:col-span-2">
+          {/* Linha inferior: donut de despesas (coluna maior) x resumo da semana (coluna menor) */}
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.2fr)_minmax(320px,1fr)] gap-6 items-start">
+            <div>
               <ExpenseChart filters={filters} />
             </div>
             {/* Resumo da Semana (widget lateral) */}
-            <div className="bg-dark-surface p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-dark-border flex-1">
+            <div className="bg-dark-surface p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-dark-border">
                 <h3 className="text-lg font-semibold text-gray-100 mb-4">Resumo da Semana</h3>
                 {lastWeekTransactions.length === 0 ? (
                   <p className="text-sm text-gray-500">
