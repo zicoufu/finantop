@@ -29,7 +29,6 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
 import { PreferencesInitializer } from "@/components/preferences-initializer";
-import { LanguageReloader } from "@/components/language-reloader";
 import { AuthInitializer } from "@/components/auth-initializer";
 
 // Layout principal para as rotas protegidas
@@ -37,9 +36,6 @@ const MainLayout = () => (
   <div className="flex min-h-screen bg-[#090608] text-gray-100">
     <Sidebar />
     <main className="flex-1 overflow-auto">
-      <div className="flex justify-end items-center p-2 bg-transparent">
-        <LanguageReloader />
-      </div>
       <div className="p-6">
         <Outlet /> {/* As rotas filhas serão renderizadas aqui */}
       </div>
