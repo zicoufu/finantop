@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus, RotateCcw } from "lucide-react";
 import ExpenseForm from "@/components/forms/expense-form";
 import RecentTransactions from "@/components/dashboard/recent-transactions";
-import { Category, Transaction, Account } from "@/lib/types";
+import { Category, Transaction } from "@/lib/types";
 import { api } from "@/lib/api";
 import { formatCurrency } from "@/lib/currency";
 import { useTranslation } from "react-i18next";
@@ -33,10 +33,6 @@ export default function Dashboard() {
     queryFn: () => api("/api/categories?type=expense"),
   });
 
-  const { data: accounts = [] } = useQuery<Account[]>({
-    queryKey: ["accounts"],
-    queryFn: () => api("/api/accounts"),
-  });
   
   // ==========================
   // Tarefas de hoje / visão rápida da semana
@@ -332,7 +328,6 @@ export default function Dashboard() {
                     })()
                   )}
                 </div>
-              </div>
             </div>
           </div>
 
@@ -343,44 +338,13 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Linha inferior: donut de despesas x contas e resumo da semana */}
+          {/* Linha inferior: donut de despesas x resumo da semana (sem widget simples de contas) */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             <div className="lg:col-span-2">
               <ExpenseChart filters={filters} />
             </div>
-            <div className="flex flex-col gap-6">
-              {/* Minhas Contas */}
-              <div className="bg-dark-surface p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-dark-border">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-100">Minhas Contas</h3>
-                  <span className="text-xs text-orange-400 font-medium cursor-default">Resumo</span>
-                </div>
-                {accounts.length === 0 ? (
-                  <p className="text-sm text-gray-500">
-                    Nenhuma conta cadastrada ainda.
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {accounts.map((acc) => (
-                      <div
-                        key={acc.id}
-                        className="flex items-center justify-between p-3 rounded-xl bg-dark-surface border border-dark-border/70"
-                      >
-                        <div>
-                          <p className="text-sm font-semibold text-gray-100">{acc.name}</p>
-                          <p className="text-xs text-gray-500">Saldo</p>
-                        </div>
-                        <span className="text-sm font-bold text-gray-100">
-                          {formatCurrency(parseFloat(acc.balance || "0"))}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Resumo da Semana (widget lateral) */}
-              <div className="bg-dark-surface p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-dark-border flex-1">
+            {/* Resumo da Semana (widget lateral) */}
+            <div className="bg-dark-surface p-6 rounded-2xl shadow-[0_0_24px_rgba(15,23,42,0.8)] border border-dark-border flex-1">
                 <h3 className="text-lg font-semibold text-gray-100 mb-4">Resumo da Semana</h3>
                 {lastWeekTransactions.length === 0 ? (
                   <p className="text-sm text-gray-500">
