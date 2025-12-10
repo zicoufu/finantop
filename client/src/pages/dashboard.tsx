@@ -339,7 +339,7 @@ export default function Dashboard() {
           </div>
 
           {/* Linha inferior: donut de despesas x resumo da semana (sem widget simples de contas) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <div className="lg:col-span-2">
               <ExpenseChart filters={filters} />
             </div>
